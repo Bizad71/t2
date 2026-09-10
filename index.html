@@ -608,11 +608,6 @@ td{
   color:#00ffb0!important;
 }
 
-.stock-product-name.error{
-  border-color:rgba(255,49,88,.45)!important;
-  color:#ff6682!important;
-}
-
 .stock-status{
   min-height:20px;
   margin-top:-5px;
@@ -799,6 +794,7 @@ td{
     </div>
   </section>
 
+
   <!-- STORE -->
   <section id="storePage" class="hidden">
 
@@ -911,6 +907,7 @@ td{
 
   </section>
 
+
   <!-- ADMIN -->
   <section id="adminPage" class="hidden admin-shell">
 
@@ -1002,6 +999,7 @@ td{
 
         </section>
 
+
         <section id="adminStoresSection" class="hidden">
 
           <div class="page-title">مدیریت <span>فروشگاه‌ها</span></div>
@@ -1021,6 +1019,7 @@ td{
 
         </section>
 
+
         <section id="adminUsersSection" class="hidden">
 
           <div class="page-title">مدیریت <span>کاربران</span></div>
@@ -1039,6 +1038,7 @@ td{
           </div>
 
         </section>
+
 
         <section id="adminLogsSection" class="hidden">
 
@@ -1074,6 +1074,7 @@ td{
     <div class="donut"></div>
 
     <div class="cards">
+
       <div class="stat-card glass">
         <div class="stat-title">فروش</div>
         <div id="chartSales" class="stat-value blue">0</div>
@@ -1083,6 +1084,7 @@ td{
         <div class="stat-title">فاکتور</div>
         <div id="chartInvoices" class="stat-value green">0</div>
       </div>
+
     </div>
 
   </div>
@@ -1143,7 +1145,7 @@ td{
   <div class="modal-box glass">
 
     <div class="modal-head">
-      <div class="modal-title">ورود به انبار</div>
+      <div class="modal-title">ورود کالا به انبار</div>
       <button class="close-btn" onclick="closeModal('stockModal')">×</button>
     </div>
 
@@ -1175,7 +1177,6 @@ td{
 
       </div>
 
-      <div id="stockLookupStatus" class="stock-status"></div>
 
       <div class="field">
 
@@ -1183,33 +1184,46 @@ td{
 
         <input
           id="stockProductName"
-          class="stock-product-name"
-          readonly
-          placeholder="پس از وارد کردن بارکد نمایش داده می‌شود"
-        >
-
-        <input
-          id="stockProduct"
-          type="hidden"
+          placeholder="نام کالا را وارد کنید"
+          required
         >
 
       </div>
+
 
       <div class="form-grid">
 
         <div class="field">
           <label>تعداد</label>
-          <input id="stockQuantity" type="number" min="1" required>
+          <input
+            id="stockQuantity"
+            type="number"
+            min="0.01"
+            step="any"
+            required
+          >
         </div>
 
         <div class="field">
           <label>قیمت خرید</label>
-          <input id="stockPurchasePrice" type="number" min="0" required>
+          <input
+            id="stockPurchasePrice"
+            type="number"
+            min="0"
+            step="any"
+            required
+          >
         </div>
 
         <div class="field">
           <label>قیمت فروش</label>
-          <input id="stockSalePrice" type="number" min="0" required>
+          <input
+            id="stockSalePrice"
+            type="number"
+            min="0"
+            step="any"
+            required
+          >
         </div>
 
         <div class="field">
@@ -1219,11 +1233,12 @@ td{
 
       </div>
 
+
       <button
         id="stockSubmitBtn"
         class="primary-btn"
         type="submit">
-        ثبت ورود
+        ثبت کالا و ورود به انبار
       </button>
 
     </form>
@@ -1370,6 +1385,7 @@ td{
 <script>
 "use strict";
 
+
 /* =========================================================
    SUPABASE
 ========================================================= */
@@ -1426,7 +1442,9 @@ function money(value){
 }
 
 function toast(message){
+
   const el=$("toast");
+
   el.textContent=message;
   el.classList.add("show");
 
@@ -1494,6 +1512,7 @@ function createNetwork(){
 
       const dx=b.x-a.x;
       const dy=b.y-a.y;
+
       const distance=Math.sqrt(dx*dx+dy*dy);
 
       if(distance>210) continue;
@@ -1505,6 +1524,7 @@ function createNetwork(){
       link.style.left=a.x+"px";
       link.style.top=a.y+"px";
       link.style.width=distance+"px";
+
       link.style.transform=
         `rotate(${Math.atan2(dy,dx)}rad)`;
 
@@ -1552,12 +1572,6 @@ $("loginForm").addEventListener("submit",async e=>{
         data.error || "ورود ناموفق بود"
       );
     }
-
-    /*
-      مهم:
-      نشست برگشتی از Edge Function باید داخل
-      Supabase JS نیز ثبت شود.
-    */
 
     const {
       data:setSessionData,
@@ -1637,12 +1651,6 @@ async function restoreSession(){
     ){
       return;
     }
-
-    /*
-      نشست قبلی را مستقیماً به Supabase JS می‌دهیم.
-      دیگر biza-login با username/password خالی
-      فراخوانی نمی‌شود.
-    */
 
     const {
       data:setSessionData,
@@ -1810,10 +1818,6 @@ async function openStore(){
 
   showStoreSection("home");
 
-  /*
-    اگر Binary Eye بعد از اسکن به همین صفحه
-    برگشته باشد، پاپ‌آپ ورود کالا دوباره باز می‌شود.
-  */
   await handleBinaryEyeReturn();
 }
 
@@ -1903,10 +1907,13 @@ function renderStore(){
     inventoryCount.toLocaleString("fa-IR");
 
   const today=new Date();
+
   today.setHours(0,0,0,0);
 
   const todaySales=state.sales.filter(s=>{
+
     const d=new Date(s.created_at);
+
     return d>=today && s.status==="completed";
   });
 
@@ -1924,8 +1931,6 @@ function renderStore(){
   renderRecentSales();
   renderProducts();
   renderInventory();
-
-  populateStockProducts();
 }
 
 
@@ -1946,20 +1951,21 @@ function showStoreSection(section){
   if(section==="home"){
 
     show("homeSection");
+
     $("navHome").classList.add("active");
 
   }else if(section==="inventory"){
 
     show("inventorySection");
+
     $("navInventory").classList.add("active");
 
   }else if(section==="sale"){
 
     openSaleModal();
+
     $("navSale").classList.add("active");
-
   }
-
 }
 
 
@@ -1980,8 +1986,11 @@ function renderProducts(){
   $("productsTable").innerHTML=`
 
     <div class="table-wrap">
+
       <table>
+
         <thead>
+
           <tr>
             <th>بارکد</th>
             <th>نام کالا</th>
@@ -1990,6 +1999,7 @@ function renderProducts(){
             <th>قیمت فروش</th>
             <th>وضعیت</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -2021,9 +2031,10 @@ function renderProducts(){
           `).join("")}
 
         </tbody>
-      </table>
-    </div>
 
+      </table>
+
+    </div>
   `;
 }
 
@@ -2083,7 +2094,9 @@ $("productForm").addEventListener(
 function openProductModal(){
 
   if(state.profile?.role!=="store_user"){
+
     toast("دسترسی مجاز نیست");
+
     return;
   }
 
@@ -2093,23 +2106,10 @@ function openProductModal(){
 
 /* =========================================================
    STOCK
+   Binary Eye فقط بارکد را برمی‌گرداند.
+   هیچ SELECT از products هنگام اسکن انجام نمی‌شود.
 ========================================================= */
 
-/*
-  این تابع برای سازگاری با ساختار قبلی نگه داشته شده.
-  دیگر select استفاده نمی‌شود؛ محصول از طریق بارکد پیدا می‌شود.
-*/
-function populateStockProducts(){
-  return;
-}
-
-
-/*
-  نرمال‌سازی بارکد
-
-  بعضی اسکنرها ممکن است اعداد فارسی/عربی
-  برگردانند. آنها را به اعداد انگلیسی تبدیل می‌کنیم.
-*/
 function normalizeBarcode(value){
 
   return String(value || "")
@@ -2119,212 +2119,20 @@ function normalizeBarcode(value){
     )
     .replace(/[٠-٩]/g,d=>
       String("٠١٢٣٤٥٦٧٨٩".indexOf(d))
-    );
+    )
+    .replace(/\s+/g,"");
 }
 
 
-/*
-  پاک کردن وضعیت پیدا کردن کالا
-*/
-function clearStockProduct(){
+/* =========================================================
+   STOCK DRAFT
+========================================================= */
 
-  $("stockProduct").value="";
-  $("stockProductName").value="";
-  $("stockProductName").classList.remove("error");
-
-  $("stockLookupStatus").textContent="";
-  $("stockLookupStatus").className="stock-status";
-
-  $("stockSubmitBtn").disabled=true;
-}
-
-
-/*
-  پیدا کردن کالا بر اساس بارکد
-  و محدود کردن جستجو به فروشگاه فعلی.
-*/
-async function lookupStockProduct(){
-
-  const barcode=normalizeBarcode(
-    $("stockBarcode").value
-  );
-
-  $("stockBarcode").value=barcode;
-
-  clearStockProduct();
-
-  if(!barcode){
-    return null;
-  }
-
-  if(!state.store?.id){
-
-    $("stockLookupStatus").textContent=
-      "فروشگاه فعلی مشخص نیست";
-
-    $("stockLookupStatus").className=
-      "stock-status error";
-
-    return null;
-  }
-
-  $("stockLookupStatus").textContent=
-    "در حال پیدا کردن کالا...";
-
-  $("stockLookupStatus").className=
-    "stock-status";
-
-  try{
-
-    /*
-      ابتدا از state استفاده می‌کنیم.
-      چون loadStoreData محصولات همین فروشگاه را
-      قبلاً دریافت کرده است.
-    */
-    let product=state.products.find(
-      p=>
-        normalizeBarcode(p.barcode)===barcode &&
-        p.store_id===state.store.id &&
-        p.is_active
-    );
-
-    /*
-      اگر در state نبود، مستقیماً از دیتابیس
-      همان فروشگاه را بررسی می‌کنیم.
-    */
-    if(!product){
-
-      const {
-        data,
-        error
-      }=await supabaseClient
-        .from("products")
-        .select("*")
-        .eq("store_id",state.store.id)
-        .eq("barcode",barcode)
-        .eq("is_active",true)
-        .maybeSingle();
-
-      if(error) throw error;
-
-      product=data || null;
-    }
-
-    if(!product){
-
-      $("stockProductName").value=
-        "کالا پیدا نشد؛ ابتدا کالا را ثبت کنید";
-
-      $("stockProductName")
-        .classList.add("error");
-
-      $("stockLookupStatus").textContent=
-        "کالا پیدا نشد؛ ابتدا کالا را ثبت کنید";
-
-      $("stockLookupStatus").className=
-        "stock-status error";
-
-      $("stockSubmitBtn").disabled=true;
-
-      return null;
-    }
-
-    $("stockProduct").value=product.id;
-
-    $("stockProductName").value=
-      product.name || "";
-
-    $("stockProductName")
-      .classList.remove("error");
-
-    $("stockLookupStatus").textContent=
-      "کالا پیدا شد";
-
-    $("stockLookupStatus").className=
-      "stock-status success";
-
-    $("stockSubmitBtn").disabled=false;
-
-    /*
-      قیمت‌های فعلی محصول را فقط به عنوان
-      مقدار اولیه فرم قرار می‌دهیم.
-      ثبت نهایی همچنان توسط add_stock انجام می‌شود.
-    */
-    if(
-      !$("stockPurchasePrice").value &&
-      product.current_purchase_price!=null
-    ){
-      $("stockPurchasePrice").value=
-        product.current_purchase_price;
-    }
-
-    if(
-      !$("stockSalePrice").value &&
-      product.current_sale_price!=null
-    ){
-      $("stockSalePrice").value=
-        product.current_sale_price;
-    }
-
-    return product;
-
-  }catch(error){
-
-    console.error(error);
-
-    $("stockLookupStatus").textContent=
-      error.message ||
-      "خطا در پیدا کردن کالا";
-
-    $("stockLookupStatus").className=
-      "stock-status error";
-
-    $("stockSubmitBtn").disabled=true;
-
-    return null;
-  }
-}
-
-
-/*
-  وقتی کاربر بارکد را دستی وارد می‌کند،
-  با خروج از فیلد کالا پیدا می‌شود.
-*/
-$("stockBarcode").addEventListener(
-  "change",
-  async ()=>{
-    await lookupStockProduct();
-  }
-);
-
-
-/*
-  برای بارکدخوان‌های USB/Bluetooth که
-  Enter ارسال می‌کنند.
-*/
-$("stockBarcode").addEventListener(
-  "keydown",
-  async e=>{
-
-    if(e.key!=="Enter") return;
-
-    e.preventDefault();
-
-    await lookupStockProduct();
-
-  }
-);
-
-
-/*
-  ذخیره اطلاعات فرم قبل از رفتن به Binary Eye.
-  این باعث می‌شود تعداد، قیمت‌ها و توضیحات
-  بعد از برگشت از اسکنر از بین نروند.
-*/
 function saveStockDraft(){
 
   const draft={
     barcode:$("stockBarcode").value,
+    productName:$("stockProductName").value,
     quantity:$("stockQuantity").value,
     purchasePrice:$("stockPurchasePrice").value,
     salePrice:$("stockSalePrice").value,
@@ -2338,14 +2146,12 @@ function saveStockDraft(){
 }
 
 
-/*
-  بازیابی فرم ورود کالا بعد از برگشت
-  از Binary Eye.
-*/
 function restoreStockDraft(){
 
   const saved=
-    sessionStorage.getItem("biza_stock_draft");
+    sessionStorage.getItem(
+      "biza_stock_draft"
+    );
 
   if(!saved) return;
 
@@ -2355,6 +2161,9 @@ function restoreStockDraft(){
 
     $("stockBarcode").value=
       draft.barcode || "";
+
+    $("stockProductName").value=
+      draft.productName || "";
 
     $("stockQuantity").value=
       draft.quantity || "";
@@ -2382,26 +2191,21 @@ function restoreStockDraft(){
 }
 
 
-/*
-  باز کردن Binary Eye.
+/* =========================================================
+   BINARY EYE
+========================================================= */
 
-  Binary Eye نتیجه اسکن را با {RESULT}
-  داخل آدرس برگشت قرار می‌دهد.
-*/
 function scanWithBinaryEye(){
 
   if(!state.store?.id){
 
     toast("فروشگاه فعلی مشخص نیست");
+
     return;
   }
 
   saveStockDraft();
 
-  /*
-    آدرس فعلی صفحه را به عنوان callback استفاده می‌کنیم.
-    پارامتر binaryEyeResult بعد از اسکن مقدار بارکد را می‌گیرد.
-  */
   const callbackUrl=
     new URL(window.location.href);
 
@@ -2418,17 +2222,14 @@ function scanWithBinaryEye(){
       callbackUrl.toString()
     );
 
-  /*
-    انتقال به Binary Eye
-  */
   window.location.href=binaryEyeUrl;
 }
 
 
-/*
-  پردازش نتیجه‌ای که Binary Eye
-  هنگام برگشت به سایت قرار داده است.
-*/
+/* =========================================================
+   BINARY EYE RETURN
+========================================================= */
+
 async function handleBinaryEyeReturn(){
 
   const currentUrl=
@@ -2444,86 +2245,90 @@ async function handleBinaryEyeReturn(){
     return;
   }
 
-  /*
-    پارامتر نتیجه را از URL پاک می‌کنیم
-    تا با refresh دوباره پردازش نشود.
-  */
   currentUrl.searchParams.delete(
     "binaryEyeResult"
   );
 
+  const cleanUrl=
+    currentUrl.pathname+
+    (
+      currentUrl.searchParams.toString()
+      ? "?"+currentUrl.searchParams.toString()
+      : ""
+    );
+
   window.history.replaceState(
     {},
     document.title,
-    currentUrl.toString()
+    cleanUrl
   );
 
-  /*
-    ابتدا پاپ‌آپ را باز می‌کنیم.
-  */
   openStockModal();
 
-  /*
-    اطلاعات قبلی فرم را برمی‌گردانیم.
-  */
   restoreStockDraft();
 
-  /*
-    بارکد اسکن‌شده باید جایگزین بارکد قبلی شود.
-  */
   const barcode=
     normalizeBarcode(scannedResult);
 
   $("stockBarcode").value=barcode;
 
-  /*
-    حالا همان بارکد را از products
-    مربوط به فروشگاه فعلی پیدا می‌کنیم.
-  */
-  await lookupStockProduct();
+  $("stockProductName").focus();
 
-  /*
-    تمرکز روی تعداد برای اینکه کاربر
-    بعد از اسکن مستقیماً ادامه دهد.
-  */
-  setTimeout(()=>{
-
-    if($("stockProduct").value){
-
-      $("stockQuantity").focus();
-
-    }else{
-
-      $("stockBarcode").focus();
-
-    }
-
-  },150);
+  toast("بارکد با موفقیت دریافت شد");
 }
 
 
+/* =========================================================
+   OPEN STOCK MODAL
+========================================================= */
+
 function openStockModal(){
 
-  populateStockProducts();
-
-  clearStockProduct();
-
-  $("stockBarcode").value="";
-
-  $("stockQuantity").value="";
-  $("stockPurchasePrice").value="";
-  $("stockSalePrice").value="";
-  $("stockNote").value="";
-
-  $("stockSubmitBtn").disabled=true;
+  $("stockForm").reset();
 
   openModal("stockModal");
 
   setTimeout(()=>{
+
     $("stockBarcode").focus();
+
   },100);
 }
 
+
+/* =========================================================
+   BARCODE INPUT
+========================================================= */
+
+$("stockBarcode").addEventListener(
+  "change",
+  e=>{
+
+    e.target.value=
+      normalizeBarcode(e.target.value);
+  }
+);
+
+
+$("stockBarcode").addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key!=="Enter") return;
+
+    e.preventDefault();
+
+    e.target.value=
+      normalizeBarcode(e.target.value);
+
+    $("stockProductName").focus();
+  }
+);
+
+
+/* =========================================================
+   STOCK SUBMIT
+========================================================= */
 
 $("stockForm").addEventListener(
   "submit",
@@ -2531,41 +2336,140 @@ $("stockForm").addEventListener(
 
     e.preventDefault();
 
-    const productId=$("stockProduct").value;
-    const quantity=Number($("stockQuantity").value);
-    const purchasePrice=Number(
-      $("stockPurchasePrice").value
-    );
-    const salePrice=Number(
-      $("stockSalePrice").value
-    );
-    const note=$("stockNote").value.trim();
-
-    if(!productId){
-
-      toast(
-        "ابتدا بارکد کالا را وارد یا اسکن کنید"
+    const barcode=
+      normalizeBarcode(
+        $("stockBarcode").value
       );
+
+    const productName=
+      $("stockProductName").value.trim();
+
+    const quantity=
+      Number(
+        $("stockQuantity").value
+      );
+
+    const purchasePrice=
+      Number(
+        $("stockPurchasePrice").value
+      );
+
+    const salePrice=
+      Number(
+        $("stockSalePrice").value
+      );
+
+    const note=
+      $("stockNote").value.trim();
+
+
+    if(!barcode){
+
+      toast("بارکد را وارد یا اسکن کنید");
+
+      $("stockBarcode").focus();
 
       return;
     }
 
-    if(quantity<=0){
 
-      toast(
-        "تعداد ورود کالا صحیح نیست"
-      );
+    if(!productName){
+
+      toast("نام کالا را وارد کنید");
+
+      $("stockProductName").focus();
 
       return;
     }
+
+
+    if(!Number.isFinite(quantity) || quantity<=0){
+
+      toast("تعداد ورود کالا صحیح نیست");
+
+      $("stockQuantity").focus();
+
+      return;
+    }
+
+
+    if(
+      !Number.isFinite(purchasePrice) ||
+      purchasePrice<0
+    ){
+
+      toast("قیمت خرید صحیح نیست");
+
+      $("stockPurchasePrice").focus();
+
+      return;
+    }
+
+
+    if(
+      !Number.isFinite(salePrice) ||
+      salePrice<0
+    ){
+
+      toast("قیمت فروش صحیح نیست");
+
+      $("stockSalePrice").focus();
+
+      return;
+    }
+
+
+    const submitBtn=$("stockSubmitBtn");
 
     try{
 
-      $("stockSubmitBtn").disabled=true;
+      submitBtn.disabled=true;
 
+      submitBtn.textContent=
+        "در حال ثبت...";
+
+
+      /*
+        مرحله اول:
+        ایجاد کالا با مشخصات دستی کاربر.
+
+        هیچ جستجویی در products انجام نمی‌شود.
+      */
       const {
-        data,
-        error
+        data:productId,
+        error:createError
+      }=await supabaseClient.rpc(
+        "create_product",
+        {
+          p_barcode:barcode,
+          p_name:productName,
+          p_description:note || null,
+          p_unit:"عدد"
+        }
+      );
+
+
+      if(createError){
+
+        throw createError;
+      }
+
+
+      if(!productId){
+
+        throw new Error(
+          "شناسه کالای ایجادشده دریافت نشد"
+        );
+      }
+
+
+      /*
+        مرحله دوم:
+        ثبت موجودی برای همان کالای تازه ایجادشده.
+      */
+      const {
+        data:batchId,
+        error:stockError
       }=await supabaseClient.rpc(
         "add_stock",
         {
@@ -2577,34 +2481,58 @@ $("stockForm").addEventListener(
         }
       );
 
-      if(error) throw error;
+
+      if(stockError){
+
+        throw stockError;
+      }
+
+
+      if(!batchId){
+
+        throw new Error(
+          "شناسه ورود انبار دریافت نشد"
+        );
+      }
+
 
       closeModal("stockModal");
 
       $("stockForm").reset();
 
-      $("stockProduct").value="";
-      $("stockProductName").value="";
-      $("stockLookupStatus").textContent="";
-      $("stockLookupStatus").className=
-        "stock-status";
+      sessionStorage.removeItem(
+        "biza_stock_draft"
+      );
 
-      $("stockSubmitBtn").disabled=true;
-
-      toast("ورود کالا ثبت شد");
+      toast(
+        "کالا و موجودی با موفقیت ثبت شد"
+      );
 
       await loadStoreData();
 
+
     }catch(error){
 
-      console.error(error);
-
-      $("stockSubmitBtn").disabled=false;
-
-      toast(
-        error.message ||
-        "ثبت ورود کالا ناموفق بود"
+      console.error(
+        "Create product + stock error:",
+        error
       );
+
+      /*
+        خطای Barcode already exists
+        مستقیماً از دیتابیس نمایش داده می‌شود.
+      */
+      toast(
+        error?.message ||
+        "ثبت کالا و ورود به انبار ناموفق بود"
+      );
+
+    }finally{
+
+      submitBtn.disabled=false;
+
+      submitBtn.textContent=
+        "ثبت کالا و ورود به انبار";
     }
 
   }
@@ -2628,9 +2556,11 @@ function renderInventory(){
   $("inventoryTable").innerHTML=`
 
     <div class="table-wrap">
+
       <table>
 
         <thead>
+
           <tr>
             <th>کالا</th>
             <th>بارکد</th>
@@ -2639,6 +2569,7 @@ function renderInventory(){
             <th>فروش</th>
             <th>تاریخ ورود</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -2656,12 +2587,18 @@ function renderInventory(){
               </td>
 
               <td>
-                ${Number(item.remaining_quantity||0).toLocaleString("fa-IR")}
+                ${Number(
+                  item.remaining_quantity||0
+                ).toLocaleString("fa-IR")}
               </td>
 
-              <td>${money(item.purchase_price)}</td>
+              <td>
+                ${money(item.purchase_price)}
+              </td>
 
-              <td>${money(item.sale_price)}</td>
+              <td>
+                ${money(item.sale_price)}
+              </td>
 
               <td>
                 ${formatDate(item.created_at)}
@@ -2674,8 +2611,8 @@ function renderInventory(){
         </tbody>
 
       </table>
-    </div>
 
+    </div>
   `;
 }
 
@@ -2697,15 +2634,18 @@ function renderRecentSales(){
   $("recentSales").innerHTML=`
 
     <div class="table-wrap">
+
       <table>
 
         <thead>
+
           <tr>
             <th>فاکتور</th>
             <th>مبلغ</th>
             <th>وضعیت</th>
             <th>تاریخ</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -2714,9 +2654,13 @@ function renderRecentSales(){
 
             <tr>
 
-              <td>${escapeHtml(s.invoice_number)}</td>
+              <td>
+                ${escapeHtml(s.invoice_number)}
+              </td>
 
-              <td>${money(s.total)}</td>
+              <td>
+                ${money(s.total)}
+              </td>
 
               <td>
                 ${
@@ -2726,7 +2670,9 @@ function renderRecentSales(){
                 }
               </td>
 
-              <td>${formatDate(s.created_at)}</td>
+              <td>
+                ${formatDate(s.created_at)}
+              </td>
 
             </tr>
 
@@ -2735,8 +2681,8 @@ function renderRecentSales(){
         </tbody>
 
       </table>
-    </div>
 
+    </div>
   `;
 }
 
@@ -2754,7 +2700,9 @@ function openSaleModal(){
   openModal("saleModal");
 
   setTimeout(()=>{
+
     $("saleBarcode").focus();
+
   },100);
 }
 
@@ -2767,7 +2715,10 @@ $("saleBarcode").addEventListener(
 
     e.preventDefault();
 
-    const barcode=e.target.value.trim();
+    const barcode=
+      normalizeBarcode(
+        e.target.value
+      );
 
     if(!barcode) return;
 
@@ -2780,13 +2731,19 @@ $("saleBarcode").addEventListener(
 
 function addProductToCart(barcode){
 
+  const normalized=
+    normalizeBarcode(barcode);
+
   const product=state.products.find(
-    p=>p.barcode===barcode && p.is_active
+    p=>
+      normalizeBarcode(p.barcode)===normalized &&
+      p.is_active
   );
 
   if(!product){
 
     toast("کالا پیدا نشد");
+
     return;
   }
 
@@ -2795,25 +2752,30 @@ function addProductToCart(barcode){
       .filter(x=>x.product_id===product.id)
       .reduce(
         (sum,x)=>
-          sum+Number(x.remaining_quantity||0),
+          sum+Number(
+            x.remaining_quantity||0
+          ),
         0
       );
 
   if(available<=0){
 
     toast("موجودی این کالا صفر است");
+
     return;
   }
 
-  const existing=state.saleCart.find(
-    x=>x.product_id===product.id
-  );
+  const existing=
+    state.saleCart.find(
+      x=>x.product_id===product.id
+    );
 
   if(existing){
 
     if(existing.quantity+1>available){
 
       toast("موجودی کافی نیست");
+
       return;
     }
 
@@ -2822,11 +2784,19 @@ function addProductToCart(barcode){
   }else{
 
     state.saleCart.push({
+
       product_id:product.id,
+
       barcode:product.barcode,
+
       name:product.name,
+
       quantity:1,
-      unit_price:Number(product.current_sale_price||0)
+
+      unit_price:
+        Number(
+          product.current_sale_price||0
+        )
     });
   }
 
@@ -2842,10 +2812,14 @@ function changeCartQty(index,delta){
 
   const available=
     state.inventory
-      .filter(x=>x.product_id===item.product_id)
+      .filter(
+        x=>x.product_id===item.product_id
+      )
       .reduce(
         (sum,x)=>
-          sum+Number(x.remaining_quantity||0),
+          sum+Number(
+            x.remaining_quantity||0
+          ),
         0
       );
 
@@ -2892,10 +2866,13 @@ function renderSaleCart(){
       <div class="product-row">
 
         <div>
+
           ${escapeHtml(item.name)}
+
           <small style="color:#687386">
             ${escapeHtml(item.barcode)}
           </small>
+
         </div>
 
         <div class="qty-control">
@@ -2913,7 +2890,9 @@ function renderSaleCart(){
         </div>
 
         <div>
-          ${money(item.quantity*item.unit_price)}
+          ${money(
+            item.quantity*item.unit_price
+          )}
         </div>
 
         <button
@@ -2926,13 +2905,15 @@ function renderSaleCart(){
 
     `).join("");
 
-  const total=state.saleCart.reduce(
-    (sum,item)=>
-      sum+item.quantity*item.unit_price,
-    0
-  );
+  const total=
+    state.saleCart.reduce(
+      (sum,item)=>
+        sum+item.quantity*item.unit_price,
+      0
+    );
 
-  $("saleTotal").textContent=money(total);
+  $("saleTotal").textContent=
+    money(total);
 }
 
 
@@ -2941,18 +2922,25 @@ async function checkout(){
   if(!state.saleCart.length){
 
     toast("فاکتور خالی است");
+
     return;
   }
 
-  const discount=Number(
-    $("saleDiscount").value || 0
-  );
+  const discount=
+    Number(
+      $("saleDiscount").value || 0
+    );
 
-  const items=state.saleCart.map(item=>({
-    product_id:item.product_id,
-    quantity:item.quantity,
-    unit_price:item.unit_price
-  }));
+  const items=
+    state.saleCart.map(item=>({
+
+      product_id:item.product_id,
+
+      quantity:item.quantity,
+
+      unit_price:item.unit_price
+
+    }));
 
   try{
 
@@ -3011,10 +2999,12 @@ function openChart(type){
         x=>x.status==="completed"
       );
 
-    const total=completed.reduce(
-      (s,x)=>s+Number(x.total||0),
-      0
-    );
+    const total=
+      completed.reduce(
+        (s,x)=>
+          s+Number(x.total||0),
+        0
+      );
 
     $("chartTitle").textContent=
       "گزارش فروش";
@@ -3031,6 +3021,7 @@ function openChart(type){
 
 
 function closeChart(){
+
   $("chartScreen").classList.remove("show");
 }
 
@@ -3064,7 +3055,10 @@ async function loadAdminData(){
       supabaseClient
         .from("stores")
         .select("*")
-        .order("created_at",{ascending:false}),
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
 
       supabaseClient
         .from("profiles")
@@ -3079,12 +3073,18 @@ async function loadAdminData(){
           stores(name,code)
         `)
         .eq("role","store_user")
-        .order("created_at",{ascending:false}),
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
 
       supabaseClient
         .from("audit_logs")
         .select("*")
-        .order("created_at",{ascending:false})
+        .order(
+          "created_at",
+          {ascending:false}
+        )
         .limit(100)
     ]);
 
@@ -3097,9 +3097,14 @@ async function loadAdminData(){
     if(logsResult.error)
       throw logsResult.error;
 
-    state.stores=storesResult.data || [];
-    state.users=profilesResult.data || [];
-    state.logs=logsResult.data || [];
+    state.stores=
+      storesResult.data || [];
+
+    state.users=
+      profilesResult.data || [];
+
+    state.logs=
+      logsResult.data || [];
 
     renderAdmin();
 
@@ -3168,22 +3173,30 @@ function showAdminSection(section){
   if(section==="dashboard"){
 
     show("adminDashboardSection");
-    $("adminNavDashboard").classList.add("active");
+
+    $("adminNavDashboard")
+      .classList.add("active");
 
   }else if(section==="stores"){
 
     show("adminStoresSection");
-    $("adminNavStores").classList.add("active");
+
+    $("adminNavStores")
+      .classList.add("active");
 
   }else if(section==="users"){
 
     show("adminUsersSection");
-    $("adminNavUsers").classList.add("active");
+
+    $("adminNavUsers")
+      .classList.add("active");
 
   }else if(section==="logs"){
 
     show("adminLogsSection");
-    $("adminNavLogs").classList.add("active");
+
+    $("adminNavLogs")
+      .classList.add("active");
   }
 }
 
@@ -3209,6 +3222,7 @@ function renderAdminStores(){
       <table>
 
         <thead>
+
           <tr>
             <th>نام</th>
             <th>کد</th>
@@ -3216,6 +3230,7 @@ function renderAdminStores(){
             <th>وضعیت</th>
             <th>تاریخ</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -3224,17 +3239,31 @@ function renderAdminStores(){
 
             <tr>
 
-              <td>${escapeHtml(store.name)}</td>
-
-              <td>${escapeHtml(store.code)}</td>
-
-              <td>${escapeHtml(store.owner_name || "-")}</td>
-
               <td>
-                ${storeStatusBadge(store.status)}
+                ${escapeHtml(store.name)}
               </td>
 
-              <td>${formatDate(store.created_at)}</td>
+              <td>
+                ${escapeHtml(store.code)}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  store.owner_name || "-"
+                )}
+              </td>
+
+              <td>
+                ${storeStatusBadge(
+                  store.status
+                )}
+              </td>
+
+              <td>
+                ${formatDate(
+                  store.created_at
+                )}
+              </td>
 
             </tr>
 
@@ -3245,7 +3274,6 @@ function renderAdminStores(){
       </table>
 
     </div>
-
   `;
 }
 
@@ -3284,14 +3312,23 @@ $("storeForm").addEventListener(
       }=await supabaseClient.rpc(
         "create_store",
         {
-          p_name:$("newStoreName").value.trim(),
-          p_code:$("newStoreCode").value.trim(),
+          p_name:
+            $("newStoreName").value.trim(),
+
+          p_code:
+            $("newStoreCode").value.trim(),
+
           p_owner_name:
-            $("newStoreOwner").value.trim() || null,
+            $("newStoreOwner").value.trim() ||
+            null,
+
           p_phone:
-            $("newStorePhone").value.trim() || null,
+            $("newStorePhone").value.trim() ||
+            null,
+
           p_address:
-            $("newStoreAddress").value.trim() || null
+            $("newStoreAddress").value.trim() ||
+            null
         }
       );
 
@@ -3325,10 +3362,14 @@ function populateUserStores(){
   $("newUserStore").innerHTML=
     `<option value="">انتخاب فروشگاه</option>`+
     state.stores
-      .filter(s=>s.status==="active")
+      .filter(
+        s=>s.status==="active"
+      )
       .map(s=>
         `<option value="${s.id}">
-          ${escapeHtml(s.name)} — ${escapeHtml(s.code)}
+          ${escapeHtml(s.name)}
+          —
+          ${escapeHtml(s.code)}
         </option>`
       )
       .join("");
@@ -3351,14 +3392,27 @@ $("userForm").addEventListener(
 
     e.preventDefault();
 
-    const storeId=$("newUserStore").value;
-    const username=$("newUsername").value.trim().toLowerCase();
-    const fullName=$("newFullName").value.trim();
-    const password=$("newPassword").value;
+    const storeId=
+      $("newUserStore").value;
+
+    const username=
+      $("newUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const fullName=
+      $("newFullName")
+        .value
+        .trim();
+
+    const password=
+      $("newPassword").value;
 
     if(!storeId){
 
       toast("فروشگاه را انتخاب کنید");
+
       return;
     }
 
@@ -3368,37 +3422,61 @@ $("userForm").addEventListener(
         await supabaseClient.auth.getSession();
 
       const accessToken=
-        sessionResult.data?.session?.access_token;
+        sessionResult.data?.session
+          ?.access_token;
 
       if(!accessToken){
 
         toast("نشست مدیر معتبر نیست");
+
         return;
       }
 
-      const response=await fetch(
-        SUPABASE_URL+"/functions/v1/biza-admin",
-        {
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
-            "apikey":SUPABASE_PUBLISHABLE_KEY,
-            "Authorization":
-              "Bearer "+accessToken
-          },
-          body:JSON.stringify({
-            action:"create_store_user",
-            store_id:storeId,
-            username,
-            full_name:fullName,
-            password
-          })
-        }
-      );
+      const response=
+        await fetch(
+          SUPABASE_URL+
+          "/functions/v1/biza-admin",
+          {
+            method:"POST",
 
-      const result=await response.json();
+            headers:{
+              "Content-Type":
+                "application/json",
 
-      if(!response.ok || !result.ok){
+              "apikey":
+                SUPABASE_PUBLISHABLE_KEY,
+
+              "Authorization":
+                "Bearer "+accessToken
+            },
+
+            body:JSON.stringify({
+
+              action:
+                "create_store_user",
+
+              store_id:
+                storeId,
+
+              username:
+                username,
+
+              full_name:
+                fullName,
+
+              password:
+                password
+            })
+          }
+        );
+
+      const result=
+        await response.json();
+
+      if(
+        !response.ok ||
+        !result.ok
+      ){
 
         throw new Error(
           result.error ||
@@ -3445,6 +3523,7 @@ function renderAdminUsers(){
       <table>
 
         <thead>
+
           <tr>
             <th>نام کاربری</th>
             <th>نام</th>
@@ -3452,6 +3531,7 @@ function renderAdminUsers(){
             <th>وضعیت</th>
             <th>تاریخ</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -3460,12 +3540,20 @@ function renderAdminUsers(){
 
             <tr>
 
-              <td>${escapeHtml(user.username)}</td>
-
-              <td>${escapeHtml(user.full_name || "-")}</td>
+              <td>
+                ${escapeHtml(user.username)}
+              </td>
 
               <td>
-                ${escapeHtml(user.stores?.name || "-")}
+                ${escapeHtml(
+                  user.full_name || "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  user.stores?.name || "-"
+                )}
               </td>
 
               <td>
@@ -3476,7 +3564,11 @@ function renderAdminUsers(){
                 }
               </td>
 
-              <td>${formatDate(user.created_at)}</td>
+              <td>
+                ${formatDate(
+                  user.created_at
+                )}
+              </td>
 
             </tr>
 
@@ -3487,7 +3579,6 @@ function renderAdminUsers(){
       </table>
 
     </div>
-
   `;
 }
 
@@ -3513,12 +3604,14 @@ function renderAdminLogs(){
       <table>
 
         <thead>
+
           <tr>
             <th>عملیات</th>
             <th>نوع</th>
             <th>شناسه</th>
             <th>تاریخ</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -3527,13 +3620,27 @@ function renderAdminLogs(){
 
             <tr>
 
-              <td>${escapeHtml(log.action)}</td>
+              <td>
+                ${escapeHtml(log.action)}
+              </td>
 
-              <td>${escapeHtml(log.entity_type || "-")}</td>
+              <td>
+                ${escapeHtml(
+                  log.entity_type || "-"
+                )}
+              </td>
 
-              <td>${escapeHtml(log.entity_id || "-")}</td>
+              <td>
+                ${escapeHtml(
+                  log.entity_id || "-"
+                )}
+              </td>
 
-              <td>${formatDate(log.created_at)}</td>
+              <td>
+                ${formatDate(
+                  log.created_at
+                )}
+              </td>
 
             </tr>
 
@@ -3544,7 +3651,6 @@ function renderAdminLogs(){
       </table>
 
     </div>
-
   `;
 }
 
@@ -3556,8 +3662,11 @@ function renderAdminLogs(){
 async function logout(){
 
   try{
+
     await supabaseClient.auth.signOut();
+
   }catch(error){
+
     console.error(error);
   }
 
@@ -3566,8 +3675,13 @@ async function logout(){
   state.profile=null;
   state.store=null;
 
-  localStorage.removeItem("biza_session");
-  localStorage.removeItem("biza_profile");
+  localStorage.removeItem(
+    "biza_session"
+  );
+
+  localStorage.removeItem(
+    "biza_profile"
+  );
 
   sessionStorage.removeItem(
     "biza_stock_draft"
@@ -3624,7 +3738,10 @@ document
       e=>{
 
         if(e.target===modal){
-          modal.classList.remove("show");
+
+          modal.classList.remove(
+            "show"
+          );
         }
 
       }
@@ -3638,13 +3755,17 @@ document
 
 createNetwork();
 
-/*
-  مهم:
-  restoreSession باید کامل شود تا state.store
-  و محصولات فروشگاه مشخص باشند؛ سپس نتیجه
-  Binary Eye پردازش می‌شود.
-*/
-restoreSession();
+(async()=>{
+
+  await restoreSession();
+
+  /*
+    اگر Binary Eye بعد از اسکن
+    به سایت برگشته باشد، نتیجه در openStore
+    پردازش می‌شود.
+  */
+
+})();
 
 </script>
 
