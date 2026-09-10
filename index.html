@@ -1,0 +1,4707 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BIZA SaaS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#000;
+    --panel:#070a0f;
+    --panel2:#0b1017;
+    --border:#182333;
+    --blue:#00a8ff;
+    --green:#00ff9d;
+    --purple:#8b5cff;
+    --red:#ff315c;
+    --text:#f4f8ff;
+    --muted:#68758a;
+}
+
+body{
+    font-family:Tahoma,Arial,sans-serif;
+    background:#000;
+    color:var(--text);
+    min-height:100vh;
+}
+
+button,
+input,
+select,
+textarea{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+#network{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    pointer-events:none;
+    opacity:.75;
+}
+
+.app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-box{
+    width:100%;
+    max-width:400px;
+    padding:30px;
+    background:rgba(5,8,13,.94);
+    border:1px solid #183047;
+    border-radius:25px;
+    box-shadow:
+        0 0 35px rgba(0,168,255,.08),
+        inset 0 0 30px rgba(0,168,255,.02);
+}
+
+.logo{
+    width:70px;
+    height:70px;
+    border:1px solid var(--blue);
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 20px;
+    color:var(--blue);
+    font-size:21px;
+    font-weight:bold;
+    box-shadow:0 0 30px rgba(0,168,255,.2);
+}
+
+.login-box h1{
+    text-align:center;
+    margin-bottom:8px;
+}
+
+.login-box p{
+    text-align:center;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:25px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.field{
+    margin-bottom:13px;
+}
+
+.field label{
+    display:block;
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+    padding:12px;
+    border-radius:11px;
+    border:1px solid var(--border);
+    outline:none;
+    background:#030507;
+    color:white;
+}
+
+.field textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 15px rgba(0,168,255,.12);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+    border:1px solid var(--border);
+    background:#080d14;
+    color:white;
+    border-radius:11px;
+    padding:11px 15px;
+}
+
+.btn:hover{
+    border-color:#34465d;
+}
+
+.btn-blue{
+    border-color:#007dbd;
+    color:#9bddff;
+}
+
+.btn-green{
+    border-color:#008f63;
+    color:#8dffd2;
+}
+
+.btn-red{
+    border-color:#8d1832;
+    color:#ff9caf;
+}
+
+.btn-purple{
+    border-color:#563aa3;
+    color:#c8b9ff;
+}
+
+.full{
+    width:100%;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    height:65px;
+    margin:10px;
+    padding:10px 13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:rgba(5,8,13,.9);
+    border:1px solid var(--border);
+    border-radius:20px;
+
+    backdrop-filter:blur(15px);
+
+    position:sticky;
+    top:8px;
+    z-index:20;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.header-logo{
+    width:42px;
+    height:42px;
+
+    border:1px solid var(--blue);
+    border-radius:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:var(--blue);
+    font-weight:bold;
+}
+
+.header-title{
+    font-size:14px;
+}
+
+.header-sub{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
+
+.header-actions{
+    display:flex;
+    gap:7px;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.container{
+    max-width:1450px;
+    margin:auto;
+    padding:10px 15px 100px;
+}
+
+.hero{
+    padding:24px;
+    border:1px solid var(--border);
+    border-radius:22px;
+    background:rgba(5,8,13,.87);
+    position:relative;
+    overflow:hidden;
+}
+
+.hero-label{
+    font-size:9px;
+    letter-spacing:3px;
+    color:var(--blue);
+}
+
+.hero h1{
+    margin-top:8px;
+    font-size:27px;
+}
+
+.hero p{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:12px;
+}
+
+.stat{
+    padding:17px;
+    background:rgba(5,8,13,.88);
+    border:1px solid var(--border);
+    border-radius:17px;
+}
+
+.stat-title{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.stat-value{
+    margin-top:8px;
+    font-size:21px;
+}
+
+/* =========================
+   QUICK BUTTONS
+========================= */
+
+.quick-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-top:14px;
+}
+
+.quick{
+    min-height:125px;
+
+    padding:18px;
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    background:#060a10;
+    color:white;
+
+    text-align:right;
+
+    transition:.25s;
+}
+
+.quick:hover{
+    transform:translateY(-4px);
+    border-color:#31506c;
+    box-shadow:0 0 25px rgba(0,168,255,.08);
+}
+
+.quick-icon{
+    font-size:27px;
+    color:var(--blue);
+    margin-bottom:15px;
+}
+
+.quick-title{
+    font-weight:bold;
+}
+
+.quick-sub{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:5px;
+}
+
+/* =========================
+   PANEL
+========================= */
+
+.panel{
+    margin-top:14px;
+    padding:18px;
+
+    background:rgba(5,8,13,.9);
+    border:1px solid var(--border);
+    border-radius:19px;
+}
+
+.panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.panel-header h2{
+    font-size:17px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrapper{
+    overflow:auto;
+    border:1px solid var(--border);
+    border-radius:13px;
+}
+
+table{
+    width:100%;
+    min-width:700px;
+    border-collapse:collapse;
+}
+
+th,
+td{
+    padding:11px;
+    border-bottom:1px solid #121a25;
+    text-align:right;
+    font-size:10px;
+}
+
+th{
+    color:var(--muted);
+    font-weight:normal;
+    background:#080c12;
+}
+
+tr:last-child td{
+    border-bottom:0;
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.search{
+    display:flex;
+    gap:8px;
+}
+
+.search input{
+    flex:1;
+    padding:12px;
+
+    background:#030507;
+    color:white;
+
+    border:1px solid var(--border);
+    border-radius:11px;
+    outline:none;
+}
+
+.search input:focus{
+    border-color:var(--blue);
+}
+
+.search-results{
+    margin-top:8px;
+    display:grid;
+    gap:6px;
+}
+
+.search-result{
+    border:1px solid var(--border);
+    background:#080c12;
+    color:white;
+    padding:12px;
+    border-radius:11px;
+    text-align:right;
+}
+
+/* =========================
+   SALES
+========================= */
+
+.sale-layout{
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:12px;
+    margin-top:12px;
+}
+
+.cart-list{
+    display:grid;
+    gap:8px;
+}
+
+.cart-item{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    align-items:center;
+    gap:8px;
+
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:11px;
+}
+
+.quantity{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.quantity button{
+    width:30px;
+    height:30px;
+
+    border:1px solid var(--border);
+    background:#090e15;
+    color:white;
+
+    border-radius:8px;
+}
+
+.summary{
+    padding:16px;
+    height:max-content;
+
+    border:1px solid var(--border);
+    border-radius:16px;
+
+    background:#070b11;
+}
+
+.summary-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin:10px 0;
+
+    font-size:11px;
+}
+
+.summary-total{
+    border-top:1px solid var(--border);
+    padding-top:13px;
+
+    font-size:18px;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+    position:fixed;
+    bottom:10px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:min(520px,calc(100% - 20px));
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    padding:8px;
+
+    border:1px solid #263142;
+    border-radius:22px;
+
+    background:rgba(2,4,8,.92);
+    backdrop-filter:blur(18px);
+
+    box-shadow:0 0 35px #000;
+
+    z-index:50;
+}
+
+.nav-btn{
+    position:relative;
+
+    border:0;
+    background:transparent;
+
+    color:#637086;
+
+    padding:9px;
+    border-radius:14px;
+
+    font-size:11px;
+}
+
+.nav-btn span{
+    display:block;
+    margin-top:5px;
+}
+
+.nav-btn.active{
+    color:#dff7ff;
+}
+
+.nav-btn.active:before{
+    content:"";
+
+    position:absolute;
+
+    top:-11px;
+    left:50%;
+
+    width:9px;
+    height:9px;
+
+    transform:translateX(-50%);
+
+    border-radius:50%;
+
+    background:var(--blue);
+
+    box-shadow:0 0 18px var(--blue);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-back{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.82);
+
+    backdrop-filter:blur(7px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:15px;
+
+    z-index:100;
+}
+
+.modal{
+    width:min(650px,100%);
+    max-height:90vh;
+    overflow:auto;
+
+    padding:18px;
+
+    background:#070a10;
+
+    border:1px solid #273548;
+    border-radius:20px;
+
+    box-shadow:0 0 50px rgba(0,168,255,.1);
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+    position:fixed;
+
+    left:50%;
+    bottom:85px;
+
+    transform:translate(-50%,20px);
+
+    opacity:0;
+
+    z-index:200;
+
+    padding:11px 17px;
+
+    background:#090e16;
+
+    border:1px solid var(--blue);
+    border-radius:12px;
+
+    font-size:10px;
+
+    transition:.25s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+.admin-layout{
+    display:grid;
+    grid-template-columns:210px 1fr;
+    gap:14px;
+}
+
+.admin-menu{
+    height:max-content;
+
+    position:sticky;
+    top:85px;
+
+    padding:8px;
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    background:#06090e;
+}
+
+.admin-menu button{
+    width:100%;
+
+    padding:12px;
+
+    text-align:right;
+
+    border:0;
+    border-radius:10px;
+
+    background:transparent;
+    color:#718097;
+
+    font-size:10px;
+}
+
+.admin-menu button.active{
+    color:#c8edff;
+    background:#0d1520;
+    border-right:2px solid var(--blue);
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+    padding:28px;
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:850px){
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .quick-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .admin-layout{
+        grid-template-columns:1fr;
+    }
+
+    .admin-menu{
+        position:static;
+        display:flex;
+        overflow:auto;
+    }
+
+    .admin-menu button{
+        min-width:max-content;
+    }
+
+    .sale-layout{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:550px){
+
+    .container{
+        padding:8px 10px 95px;
+    }
+
+    .header{
+        margin:6px;
+    }
+
+    .hero{
+        padding:18px;
+    }
+
+    .hero h1{
+        font-size:22px;
+    }
+
+    .stats{
+        gap:7px;
+    }
+
+    .stat{
+        padding:13px;
+    }
+
+    .stat-value{
+        font-size:18px;
+    }
+
+    .quick-grid{
+        gap:8px;
+    }
+
+    .quick{
+        min-height:108px;
+        padding:14px;
+    }
+
+    .panel{
+        padding:14px;
+    }
+
+    .cart-item{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="network"></canvas>
+
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+
+/* =====================================================
+   BIZA CONFIG
+===================================================== */
+
+const SUPABASE_URL =
+    "YOUR_SUPABASE_PROJECT_URL";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
+
+const state = {
+
+    session:null,
+
+    profile:null,
+
+    store:null,
+
+    products:[],
+
+    sales:[],
+
+    inventory:[],
+
+    cart:[],
+
+    page:"home",
+
+    adminPage:"dashboard"
+
+};
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function money(value){
+
+    return new Intl.NumberFormat("fa-IR")
+        .format(Number(value || 0));
+
+}
+
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replace(/[&<>"']/g,function(c){
+
+            return {
+                "&":"&amp;",
+                "<":"&lt;",
+                ">":"&gt;",
+                '"':"&quot;",
+                "'":"&#039;"
+            }[c];
+
+        });
+
+}
+
+
+function toast(message,error=false){
+
+    const el =
+        document.getElementById("toast");
+
+    el.textContent = message;
+
+    el.style.borderColor =
+        error ? "var(--red)" : "var(--blue)";
+
+    el.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer =
+        setTimeout(function(){
+
+            el.classList.remove("show");
+
+        },2600);
+
+}
+
+
+function showModal(title,content){
+
+    const old =
+        document.getElementById("modal");
+
+    if(old) old.remove();
+
+    const div =
+        document.createElement("div");
+
+    div.id="modal";
+
+    div.className="modal-back";
+
+    div.innerHTML=`
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <h2>${title}</h2>
+
+                <button
+                    class="btn btn-red"
+                    onclick="closeModal()">
+                    ×
+                </button>
+
+            </div>
+
+            ${content}
+
+        </div>
+
+    `;
+
+    document.body.appendChild(div);
+
+}
+
+
+function closeModal(){
+
+    const modal =
+        document.getElementById("modal");
+
+    if(modal) modal.remove();
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function loginPage(){
+
+    document.getElementById("app").innerHTML=`
+
+        <div class="login-page">
+
+            <div class="login-box">
+
+                <div class="logo">
+                    BZ
+                </div>
+
+                <h1>
+                    BIZA SaaS
+                </h1>
+
+                <p>
+                    مدیریت فروشگاه
+                </p>
+
+                <div class="field">
+
+                    <label>
+                        نام کاربری
+                    </label>
+
+                    <input
+                        id="loginUsername"
+                        autocomplete="username">
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        رمز عبور
+                    </label>
+
+                    <input
+                        id="loginPassword"
+                        type="password"
+                        autocomplete="current-password">
+
+                </div>
+
+                <button
+                    class="btn btn-blue full"
+                    onclick="login()">
+
+                    ورود به سیستم
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+async function login(){
+
+    const username =
+        document
+        .getElementById("loginUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+    if(!username || !password){
+
+        toast(
+            "نام کاربری و رمز عبور را وارد کنید",
+            true
+        );
+
+        return;
+
+    }
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/functions/v1/biza-login",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_PUBLISHABLE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_PUBLISHABLE_KEY
+                    },
+
+                    body:JSON.stringify({
+
+                        username,
+                        password
+
+                    })
+
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if(!response.ok || !result.ok){
+
+            throw new Error(
+                result.error ||
+                "ورود ناموفق بود"
+            );
+
+        }
+
+        await supabaseClient.auth.setSession({
+
+            access_token:
+                result.session.access_token,
+
+            refresh_token:
+                result.session.refresh_token
+
+        });
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
+async function initialize(){
+
+    const {
+        data
+    } =
+        await supabaseClient
+        .auth
+        .getSession();
+
+    if(data.session){
+
+        await loadUser(
+            data.session
+        );
+
+    }
+    else{
+
+        loginPage();
+
+    }
+
+
+    supabaseClient
+        .auth
+        .onAuthStateChange(
+            async function(event,session){
+
+                if(event === "SIGNED_OUT"){
+
+                    state.session=null;
+
+                    state.profile=null;
+
+                    state.store=null;
+
+                    loginPage();
+
+                }
+
+            }
+        );
+
+}
+
+
+async function loadUser(session){
+
+    state.session=session;
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id",session.user.id)
+        .maybeSingle();
+
+    if(error || !data){
+
+        toast(
+            "پروفایل کاربر پیدا نشد",
+            true
+        );
+
+        return;
+
+    }
+
+    state.profile=data;
+
+
+    if(data.role === "admin"){
+
+        adminPage();
+
+    }
+    else{
+
+        const {
+            data:store
+        } =
+            await supabaseClient
+            .from("stores")
+            .select("*")
+            .eq("id",data.store_id)
+            .maybeSingle();
+
+        state.store=store;
+
+        await loadStoreData();
+
+        storePage();
+
+    }
+
+}
+
+
+async function logout(){
+
+    await supabaseClient
+        .auth
+        .signOut();
+
+}
+
+
+/* =====================================================
+   STORE DATA
+===================================================== */
+
+async function loadStoreData(){
+
+    const products =
+        await supabaseClient
+        .from("products")
+        .select("*")
+        .eq("store_id",state.store.id)
+        .order("name");
+
+    state.products =
+        products.data || [];
+
+
+    const sales =
+        await supabaseClient
+        .from("sales")
+        .select("*")
+        .eq("store_id",state.store.id)
+        .order("created_at",{ascending:false})
+        .limit(100);
+
+    state.sales =
+        sales.data || [];
+
+}
+
+
+async function loadInventory(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .rpc("get_inventory_report");
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+    state.inventory=data || [];
+
+}
+
+
+/* =====================================================
+   STORE LAYOUT
+===================================================== */
+
+function storePage(){
+
+    document.getElementById("app").innerHTML=`
+
+        <div class="app">
+
+            ${header()}
+
+            <main class="container">
+
+                <div id="storeContent"></div>
+
+            </main>
+
+            ${bottomNav()}
+
+        </div>
+
+    `;
+
+    renderStoreContent();
+
+}
+
+
+function header(){
+
+    return `
+
+        <header class="header">
+
+            <div class="header-left">
+
+                <div class="header-logo">
+                    BZ
+                </div>
+
+                <div>
+
+                    <div class="header-title">
+                        ${escapeHtml(
+                            state.store?.name ||
+                            "بیزا مارکت"
+                        )}
+                    </div>
+
+                    <div class="header-sub">
+                        ${escapeHtml(
+                            state.store?.code ||
+                            ""
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    class="btn"
+                    onclick="logout()">
+
+                    خروج
+
+                </button>
+
+            </div>
+
+        </header>
+
+    `;
+
+}
+
+
+function bottomNav(){
+
+    return `
+
+        <nav class="bottom-nav">
+
+            <button
+                class="nav-btn ${
+                    state.page==="sale"
+                    ? "active":""
+                }"
+                onclick="changeStorePage('sale')">
+
+                ▣
+
+                <span>
+                    فروش
+                </span>
+
+            </button>
+
+
+            <button
+                class="nav-btn ${
+                    state.page==="home"
+                    ? "active":""
+                }"
+                onclick="changeStorePage('home')">
+
+                ⌂
+
+                <span>
+                    خانه
+                </span>
+
+            </button>
+
+
+            <button
+                class="nav-btn ${
+                    state.page==="inventory"
+                    ? "active":""
+                }"
+                onclick="changeStorePage('inventory')">
+
+                ▤
+
+                <span>
+                    انبار
+                </span>
+
+            </button>
+
+        </nav>
+
+    `;
+
+}
+
+
+function changeStorePage(page){
+
+    state.page=page;
+
+    renderStoreContent();
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(function(btn){
+
+            btn.classList.remove("active");
+
+        });
+
+}
+
+
+/* =====================================================
+   STORE CONTENT
+===================================================== */
+
+function renderStoreContent(){
+
+    const content =
+        document.getElementById("storeContent");
+
+    if(!content) return;
+
+
+    if(state.page==="sale"){
+
+        content.innerHTML=
+            salePage();
+
+        return;
+
+    }
+
+
+    if(state.page==="inventory"){
+
+        content.innerHTML=
+            inventoryPage();
+
+        loadInventory()
+            .then(function(){
+
+                renderInventoryTable();
+
+            });
+
+        return;
+
+    }
+
+
+    content.innerHTML=
+        homePage();
+
+}
+
+
+/* =====================================================
+   HOME
+===================================================== */
+
+function homePage(){
+
+    const today =
+        new Date();
+
+    today.setHours(
+        0,0,0,0
+    );
+
+    const todaySales =
+        state.sales.filter(function(s){
+
+            return (
+                s.status==="completed" &&
+                new Date(s.created_at)>=today
+            );
+
+        });
+
+
+    const todayAmount =
+        todaySales.reduce(
+            function(sum,s){
+
+                return sum+
+                    Number(s.total||0);
+
+            },
+            0
+        );
+
+
+    return `
+
+        <section class="hero">
+
+            <div class="hero-label">
+                BIZA STORE
+            </div>
+
+            <h1>
+                ${escapeHtml(
+                    state.store?.name ||
+                    "بیزا مارکت"
+                )}
+            </h1>
+
+            <p>
+                ${escapeHtml(
+                    state.store?.code || ""
+                )}
+            </p>
+
+        </section>
+
+
+        <section class="stats">
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    فروش امروز
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="color:var(--blue)">
+
+                    ${money(todayAmount)}
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    فاکتور امروز
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="color:var(--green)">
+
+                    ${money(todaySales.length)}
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    کالاها
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="color:var(--purple)">
+
+                    ${money(
+                        state.products.length
+                    )}
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    فاکتورها
+                </div>
+
+                <div class="stat-value">
+
+                    ${money(
+                        state.sales.length
+                    )}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="quick-grid">
+
+            <button
+                class="quick"
+                onclick="changeStorePage('sale')">
+
+                <div class="quick-icon">
+                    ＋
+                </div>
+
+                <div class="quick-title">
+                    فروش جدید
+                </div>
+
+                <div class="quick-sub">
+                    ثبت سریع فاکتور
+                </div>
+
+            </button>
+
+
+            <button
+                class="quick"
+                onclick="productModal()">
+
+                <div class="quick-icon">
+                    ⌁
+                </div>
+
+                <div class="quick-title">
+                    ثبت کالا
+                </div>
+
+                <div class="quick-sub">
+                    بارکد و مشخصات کالا
+                </div>
+
+            </button>
+
+
+            <button
+                class="quick"
+                onclick="stockModal()">
+
+                <div class="quick-icon">
+                    ⇩
+                </div>
+
+                <div class="quick-title">
+                    ورود به انبار
+                </div>
+
+                <div class="quick-sub">
+                    ثبت موجودی و قیمت
+                </div>
+
+            </button>
+
+
+            <button
+                class="quick"
+                onclick="salesReportModal()">
+
+                <div class="quick-icon">
+                    ◌
+                </div>
+
+                <div class="quick-title">
+                    گزارش فروش
+                </div>
+
+                <div class="quick-sub">
+                    فاکتورها و مبالغ
+                </div>
+
+            </button>
+
+        </section>
+
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    آخرین فاکتورها
+                </h2>
+
+                <button
+                    class="btn"
+                    onclick="salesReportModal()">
+
+                    همه
+
+                </button>
+
+            </div>
+
+            ${salesTable(
+                state.sales.slice(0,8)
+            )}
+
+        </section>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SALES
+===================================================== */
+
+function salePage(){
+
+    return `
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    فروش جدید
+                </h2>
+
+                <button
+                    class="btn btn-red"
+                    onclick="clearCart()">
+
+                    پاک کردن
+
+                </button>
+
+            </div>
+
+
+            <div class="search">
+
+                <input
+                    id="saleSearch"
+                    placeholder="بارکد یا نام کالا..."
+                    oninput="searchProducts()">
+
+                <button
+                    class="btn btn-blue"
+                    onclick="focusSearch()">
+
+                    اسکن
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="searchResults"
+                class="search-results">
+            </div>
+
+
+            <div class="sale-layout">
+
+                <div class="cart-list">
+
+                    ${cartHtml()}
+
+                </div>
+
+
+                <div class="summary">
+
+                    <h3>
+                        خلاصه فاکتور
+                    </h3>
+
+
+                    <div class="summary-line">
+
+                        <span>
+                            مبلغ
+                        </span>
+
+                        <b>
+                            ${money(
+                                cartSubtotal()
+                            )}
+                        </b>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            تخفیف
+                        </label>
+
+                        <input
+                            id="discount"
+                            type="number"
+                            min="0"
+                            value="0"
+                            oninput="updateCartTotal()">
+
+                    </div>
+
+
+                    <div class="summary-line summary-total">
+
+                        <span>
+                            نهایی
+                        </span>
+
+                        <b id="cartTotal">
+                            ${money(
+                                cartSubtotal()
+                            )}
+                        </b>
+
+                    </div>
+
+
+                    <button
+                        class="btn btn-green full"
+                        onclick="checkout()">
+
+                        ثبت فاکتور
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+function focusSearch(){
+
+    document
+        .getElementById("saleSearch")
+        ?.focus();
+
+}
+
+
+function searchProducts(){
+
+    const q =
+        document
+        .getElementById("saleSearch")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const box =
+        document.getElementById(
+            "searchResults"
+        );
+
+    if(!q){
+
+        box.innerHTML="";
+
+        return;
+
+    }
+
+
+    const results =
+        state.products
+        .filter(function(p){
+
+            return (
+                String(p.name||"")
+                    .toLowerCase()
+                    .includes(q)
+                ||
+                String(p.barcode||"")
+                    .toLowerCase()
+                    .includes(q)
+            );
+
+        })
+        .slice(0,10);
+
+
+    box.innerHTML =
+        results.length
+
+        ?
+
+        results.map(function(p){
+
+            return `
+
+                <button
+                    class="search-result"
+                    onclick="addToCart('${p.id}')">
+
+                    <b>
+                        ${escapeHtml(p.name)}
+                    </b>
+
+                    <br>
+
+                    <span
+                        style="color:var(--muted)">
+
+                        ${escapeHtml(
+                            p.barcode || ""
+                        )}
+
+                        —
+
+                        ${money(
+                            p.current_sale_price
+                        )}
+
+                        ریال
+
+                    </span>
+
+                </button>
+
+            `;
+
+        }).join("")
+
+        :
+
+        `<div class="empty">
+            کالا پیدا نشد
+        </div>`;
+
+}
+
+
+function addToCart(productId){
+
+    const item =
+        state.cart.find(
+            x=>x.product_id===productId
+        );
+
+
+    if(item){
+
+        item.quantity++;
+
+    }
+    else{
+
+        state.cart.push({
+
+            product_id:productId,
+
+            quantity:1
+
+        });
+
+    }
+
+
+    renderStoreContent();
+
+}
+
+
+function cartSubtotal(){
+
+    return state.cart.reduce(
+        function(total,item){
+
+            const product =
+                state.products.find(
+                    p=>p.id===item.product_id
+                );
+
+            return total +
+                item.quantity *
+                Number(
+                    product?.current_sale_price||0
+                );
+
+        },
+        0
+    );
+
+}
+
+
+function cartHtml(){
+
+    if(!state.cart.length){
+
+        return `
+            <div class="empty">
+                فاکتور خالی است.
+            </div>
+        `;
+
+    }
+
+
+    return state.cart.map(function(item){
+
+        const product =
+            state.products.find(
+                p=>p.id===item.product_id
+            );
+
+
+        return `
+
+            <div class="cart-item">
+
+                <div>
+
+                    <b>
+                        ${escapeHtml(
+                            product?.name
+                        )}
+                    </b>
+
+                    <div
+                        style="color:var(--muted);
+                               font-size:9px;
+                               margin-top:4px">
+
+                        ${money(
+                            product?.current_sale_price
+                        )}
+                        ریال
+
+                    </div>
+
+                </div>
+
+
+                <div class="quantity">
+
+                    <button
+                        onclick="changeQty(
+                            '${item.product_id}',
+                            -1
+                        )">
+
+                        −
+
+                    </button>
+
+                    <b>
+                        ${item.quantity}
+                    </b>
+
+                    <button
+                        onclick="changeQty(
+                            '${item.product_id}',
+                            1
+                        )">
+
+                        ＋
+
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="btn btn-red"
+                    onclick="removeFromCart(
+                        '${item.product_id}'
+                    )">
+
+                    ×
+
+                </button>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}
+
+
+function changeQty(id,direction){
+
+    const item =
+        state.cart.find(
+            x=>x.product_id===id
+        );
+
+    if(!item) return;
+
+
+    item.quantity += direction;
+
+
+    if(item.quantity<=0){
+
+        removeFromCart(id);
+
+        return;
+
+    }
+
+
+    renderStoreContent();
+
+}
+
+
+function removeFromCart(id){
+
+    state.cart =
+        state.cart.filter(
+            x=>x.product_id!==id
+        );
+
+    renderStoreContent();
+
+}
+
+
+function clearCart(){
+
+    state.cart=[];
+
+    renderStoreContent();
+
+}
+
+
+function updateCartTotal(){
+
+    const discount =
+        Number(
+            document
+            .getElementById("discount")
+            ?.value || 0
+        );
+
+
+    const total =
+        Math.max(
+            0,
+            cartSubtotal()-discount
+        );
+
+
+    const element =
+        document.getElementById(
+            "cartTotal"
+        );
+
+    if(element){
+
+        element.textContent =
+            money(total);
+
+    }
+
+}
+
+
+async function checkout(){
+
+    if(!state.cart.length){
+
+        toast(
+            "فاکتور خالی است",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const discount =
+        Number(
+            document
+            .getElementById("discount")
+            ?.value || 0
+        );
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "create_sale",
+                {
+
+                    p_items:
+                        state.cart.map(
+                            function(x){
+
+                                return {
+
+                                    product_id:
+                                        x.product_id,
+
+                                    quantity:
+                                        x.quantity
+
+                                };
+
+                            }
+                        ),
+
+                    p_discount:
+                        discount
+
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        state.cart=[];
+
+        await loadStoreData();
+
+        state.page="home";
+
+        renderStoreContent();
+
+
+        toast(
+            "فاکتور شماره " +
+            data.invoice_number +
+            " ثبت شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   INVENTORY
+===================================================== */
+
+function inventoryPage(){
+
+    return `
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    انبار
+                </h2>
+
+                <button
+                    class="btn btn-green"
+                    onclick="stockModal()">
+
+                    ＋ ورود کالا
+
+                </button>
+
+            </div>
+
+
+            <div class="search">
+
+                <input
+                    id="inventorySearch"
+                    placeholder="جستجوی کالا..."
+                    oninput="filterInventory()">
+
+            </div>
+
+
+            <div
+                id="inventoryTable"
+                style="margin-top:12px">
+
+                <div class="empty">
+                    در حال بارگذاری...
+                </div>
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+function renderInventoryTable(){
+
+    const box =
+        document.getElementById(
+            "inventoryTable"
+        );
+
+    if(!box) return;
+
+
+    if(!state.inventory.length){
+
+        box.innerHTML=`
+            <div class="empty">
+                انبار خالی است.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    box.innerHTML=inventoryTable(
+        state.inventory
+    );
+
+}
+
+
+function inventoryTable(data){
+
+    return `
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            کالا
+                        </th>
+
+                        <th>
+                            بارکد
+                        </th>
+
+                        <th>
+                            موجودی
+                        </th>
+
+                        <th>
+                            خرید
+                        </th>
+
+                        <th>
+                            فروش
+                        </th>
+
+                        <th>
+                            ارزش
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${data.map(function(row){
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    ${escapeHtml(
+                                        row.product_name
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        row.barcode || ""
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${money(
+                                        row.stock
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${money(
+                                        row.current_purchase_price
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${money(
+                                        row.current_sale_price
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${money(
+                                        row.inventory_value
+                                    )}
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    }).join("")}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+function filterInventory(){
+
+    const q =
+        document
+        .getElementById(
+            "inventorySearch"
+        )
+        .value
+        .toLowerCase();
+
+
+    const filtered =
+        state.inventory.filter(
+            function(row){
+
+                return (
+
+                    String(
+                        row.product_name||""
+                    )
+                    .toLowerCase()
+                    .includes(q)
+
+                    ||
+
+                    String(
+                        row.barcode||""
+                    )
+                    .toLowerCase()
+                    .includes(q)
+
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "inventoryTable"
+        )
+        .innerHTML =
+            inventoryTable(filtered);
+
+}
+
+
+/* =====================================================
+   PRODUCT MODAL
+===================================================== */
+
+function productModal(){
+
+    showModal(
+        "ثبت کالا",
+
+        `
+
+        <div class="field">
+
+            <label>
+                بارکد
+            </label>
+
+            <input id="productBarcode">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                نام کالا
+            </label>
+
+            <input id="productName">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                واحد
+            </label>
+
+            <input
+                id="productUnit"
+                value="عدد">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                توضیحات
+            </label>
+
+            <textarea
+                id="productDescription">
+            </textarea>
+
+        </div>
+
+
+        <button
+            class="btn btn-blue full"
+            onclick="createProduct()">
+
+            ثبت کالا
+
+        </button>
+
+        `
+    );
+
+}
+
+
+async function createProduct(){
+
+    try{
+
+        const {
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "create_product",
+                {
+
+                    p_barcode:
+                        document
+                        .getElementById(
+                            "productBarcode"
+                        )
+                        .value,
+
+                    p_name:
+                        document
+                        .getElementById(
+                            "productName"
+                        )
+                        .value,
+
+                    p_description:
+                        document
+                        .getElementById(
+                            "productDescription"
+                        )
+                        .value,
+
+                    p_unit:
+                        document
+                        .getElementById(
+                            "productUnit"
+                        )
+                        .value
+
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        closeModal();
+
+        await loadStoreData();
+
+        renderStoreContent();
+
+        toast(
+            "کالا ثبت شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   STOCK MODAL
+===================================================== */
+
+function stockModal(){
+
+    if(!state.products.length){
+
+        toast(
+            "ابتدا کالا ثبت کنید",
+            true
+        );
+
+        return;
+
+    }
+
+
+    showModal(
+        "ورود کالا به انبار",
+
+        `
+
+        <div class="field">
+
+            <label>
+                کالا
+            </label>
+
+            <select id="stockProduct">
+
+                ${state.products.map(
+                    function(p){
+
+                        return `
+
+                            <option
+                                value="${p.id}">
+
+                                ${escapeHtml(
+                                    p.name
+                                )}
+
+                                —
+                                ${escapeHtml(
+                                    p.barcode||""
+                                )}
+
+                            </option>
+
+                        `;
+
+                    }
+                ).join("")}
+
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                تعداد
+            </label>
+
+            <input
+                id="stockQuantity"
+                type="number"
+                min="0.001"
+                step="0.001">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                قیمت خرید
+            </label>
+
+            <input
+                id="stockBuy"
+                type="number"
+                min="0">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                قیمت فروش
+            </label>
+
+            <input
+                id="stockSell"
+                type="number"
+                min="0">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                توضیحات
+            </label>
+
+            <textarea
+                id="stockNote">
+            </textarea>
+
+        </div>
+
+
+        <button
+            class="btn btn-green full"
+            onclick="addStock()">
+
+            ثبت ورود کالا
+
+        </button>
+
+        `
+    );
+
+}
+
+
+async function addStock(){
+
+    try{
+
+        const {
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "add_stock",
+                {
+
+                    p_product_id:
+                        document
+                        .getElementById(
+                            "stockProduct"
+                        )
+                        .value,
+
+                    p_quantity:
+                        Number(
+                            document
+                            .getElementById(
+                                "stockQuantity"
+                            )
+                            .value
+                        ),
+
+                    p_purchase_price:
+                        Number(
+                            document
+                            .getElementById(
+                                "stockBuy"
+                            )
+                            .value
+                        ),
+
+                    p_sale_price:
+                        Number(
+                            document
+                            .getElementById(
+                                "stockSell"
+                            )
+                            .value
+                        ),
+
+                    p_note:
+                        document
+                        .getElementById(
+                            "stockNote"
+                        )
+                        .value
+
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        closeModal();
+
+        await loadStoreData();
+
+        renderStoreContent();
+
+        toast(
+            "ورود کالا ثبت شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SALES REPORT
+===================================================== */
+
+async function salesReportModal(){
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "get_sales_report",
+                {
+                    p_from:null,
+                    p_to:null
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        showModal(
+            "گزارش فروش",
+            salesTable(data || [])
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+function salesTable(data){
+
+    if(!data.length){
+
+        return `
+            <div class="empty">
+                اطلاعاتی وجود ندارد.
+            </div>
+        `;
+
+    }
+
+
+    return `
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            فاکتور
+                        </th>
+
+                        <th>
+                            مبلغ
+                        </th>
+
+                        <th>
+                            وضعیت
+                        </th>
+
+                        <th>
+                            تاریخ
+                        </th>
+
+                        <th>
+                            عملیات
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${data.map(function(s){
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    #${s.invoice_number}
+                                </td>
+
+                                <td>
+                                    ${money(
+                                        s.total
+                                    )}
+                                    ریال
+                                </td>
+
+                                <td>
+
+                                    ${
+                                        s.status==="completed"
+                                        ?"تکمیل"
+                                        :"لغو"
+                                    }
+
+                                </td>
+
+                                <td>
+                                    ${new Date(
+                                        s.created_at
+                                    ).toLocaleString(
+                                        "fa-IR"
+                                    )}
+                                </td>
+
+                                <td>
+
+                                    ${
+                                        s.status==="completed"
+
+                                        ?
+
+                                        `<button
+                                            class="btn btn-red"
+                                            onclick="cancelSale('${s.id}')">
+
+                                            لغو
+
+                                        </button>`
+
+                                        :
+
+                                        ""
+
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    }).join("")}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+async function cancelSale(id){
+
+    if(!confirm(
+        "فاکتور لغو و موجودی برگشت داده شود؟"
+    )) return;
+
+
+    try{
+
+        const {
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "cancel_sale",
+                {
+                    p_sale_id:id
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        await loadStoreData();
+
+        renderStoreContent();
+
+        toast(
+            "فاکتور لغو شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ADMIN
+===================================================== */
+
+function adminPage(){
+
+    document.getElementById("app").innerHTML=`
+
+        <div class="app">
+
+            ${header()}
+
+            <main class="container">
+
+                <div class="admin-layout">
+
+                    <aside class="admin-menu">
+
+                        <button
+                            class="active"
+                            onclick="adminNavigate('dashboard')">
+
+                            داشبورد
+
+                        </button>
+
+                        <button
+                            onclick="adminNavigate('stores')">
+
+                            فروشگاه‌ها
+
+                        </button>
+
+                        <button
+                            onclick="adminNavigate('users')">
+
+                            کاربران
+
+                        </button>
+
+                        <button
+                            onclick="adminNavigate('logs')">
+
+                            گزارش فعالیت
+
+                        </button>
+
+                    </aside>
+
+
+                    <section id="adminContent">
+
+                    </section>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    `;
+
+
+    renderAdmin();
+
+}
+
+
+function adminNavigate(page){
+
+    state.adminPage=page;
+
+    document
+        .querySelectorAll(".admin-menu button")
+        .forEach(function(button){
+
+            button.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    const buttons =
+        document
+        .querySelectorAll(
+            ".admin-menu button"
+        );
+
+
+    const index = {
+
+        dashboard:0,
+        stores:1,
+        users:2,
+        logs:3
+
+    }[page];
+
+
+    if(buttons[index]){
+
+        buttons[index]
+            .classList.add("active");
+
+    }
+
+
+    renderAdmin();
+
+}
+
+
+async function renderAdmin(){
+
+    const box =
+        document.getElementById(
+            "adminContent"
+        );
+
+    if(!box) return;
+
+
+    if(state.adminPage==="dashboard"){
+
+        box.innerHTML=`
+
+            <section class="hero">
+
+                <div class="hero-label">
+                    CENTRAL CONTROL
+                </div>
+
+                <h1>
+                    مدیریت مرکزی BIZA SaaS
+                </h1>
+
+                <p>
+                    مدیریت فروشگاه‌ها،
+                    کاربران و فعالیت سیستم
+                </p>
+
+            </section>
+
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-title">
+                        فروشگاه‌ها
+                    </div>
+
+                    <div
+                        id="adminStoreCount"
+                        class="stat-value">
+
+                        ...
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-title">
+                        فروشگاه فعال
+                    </div>
+
+                    <div
+                        id="adminActiveCount"
+                        class="stat-value"
+                        style="color:var(--green)">
+
+                        ...
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-title">
+                        کاربران
+                    </div>
+
+                    <div
+                        id="adminUserCount"
+                        class="stat-value"
+                        style="color:var(--purple)">
+
+                        ...
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-title">
+                        وضعیت
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        style="color:var(--green)">
+
+                        ONLINE
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <section class="quick-grid">
+
+                <button
+                    class="quick"
+                    onclick="newStoreModal()">
+
+                    <div class="quick-icon">
+                        ＋
+                    </div>
+
+                    <div class="quick-title">
+                        فروشگاه جدید
+                    </div>
+
+                    <div class="quick-sub">
+                        ایجاد Tenant
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="adminNavigate('stores')">
+
+                    <div class="quick-icon">
+                        ▦
+                    </div>
+
+                    <div class="quick-title">
+                        فروشگاه‌ها
+                    </div>
+
+                    <div class="quick-sub">
+                        مدیریت فروشگاه‌ها
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="newUserModal()">
+
+                    <div class="quick-icon">
+                        ♙
+                    </div>
+
+                    <div class="quick-title">
+                        کاربر جدید
+                    </div>
+
+                    <div class="quick-sub">
+                        ساخت حساب فروشگاه
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="adminNavigate('logs')">
+
+                    <div class="quick-icon">
+                        ◌
+                    </div>
+
+                    <div class="quick-title">
+                        Audit Log
+                    </div>
+
+                    <div class="quick-sub">
+                        فعالیت سیستم
+                    </div>
+
+                </button>
+
+            </section>
+
+        `;
+
+
+        loadAdminStats();
+
+        return;
+
+    }
+
+
+    if(state.adminPage==="stores"){
+
+        await renderAdminStores();
+
+        return;
+
+    }
+
+
+    if(state.adminPage==="users"){
+
+        await renderAdminUsers();
+
+        return;
+
+    }
+
+
+    if(state.adminPage==="logs"){
+
+        await renderAdminLogs();
+
+    }
+
+}
+
+
+/* =====================================================
+   ADMIN STATS
+===================================================== */
+
+async function loadAdminStats(){
+
+    const {
+        data:stores
+    } =
+        await supabaseClient
+        .from("stores")
+        .select("*");
+
+
+    const {
+        count
+    } =
+        await supabaseClient
+        .from("profiles")
+        .select("*",{
+            count:"exact",
+            head:true
+        });
+
+
+    document
+        .getElementById(
+            "adminStoreCount"
+        )
+        .textContent =
+            money(
+                stores?.length || 0
+            );
+
+
+    document
+        .getElementById(
+            "adminActiveCount"
+        )
+        .textContent =
+            money(
+                (stores || [])
+                .filter(
+                    s=>s.status==="active"
+                )
+                .length
+            );
+
+
+    document
+        .getElementById(
+            "adminUserCount"
+        )
+        .textContent =
+            money(
+                count || 0
+            );
+
+}
+
+
+/* =====================================================
+   ADMIN STORES
+===================================================== */
+
+async function renderAdminStores(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("stores")
+        .select("*")
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "adminContent"
+        )
+        .innerHTML=`
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    فروشگاه‌ها
+                </h2>
+
+                <button
+                    class="btn btn-blue"
+                    onclick="newStoreModal()">
+
+                    ＋ فروشگاه جدید
+
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                نام
+                            </th>
+
+                            <th>
+                                کد
+                            </th>
+
+                            <th>
+                                مالک
+                            </th>
+
+                            <th>
+                                وضعیت
+                            </th>
+
+                            <th>
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${(data||[])
+                        .map(function(store){
+
+                            return `
+
+                                <tr>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            store.name
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            store.code
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            store.owner_name||""
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            store.status
+                                        )}
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            class="btn"
+                                            onclick="changeStoreStatus(
+                                                '${store.id}',
+                                                '${store.status}'
+                                            )">
+
+                                            وضعیت
+
+                                        </button>
+
+                                        <button
+                                            class="btn btn-purple"
+                                            onclick="newUserModal(
+                                                '${store.id}'
+                                            )">
+
+                                            ＋ کاربر
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }).join("")}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+function newStoreModal(){
+
+    showModal(
+        "ایجاد فروشگاه",
+
+        `
+
+        <div class="field">
+
+            <label>
+                نام فروشگاه
+            </label>
+
+            <input id="newStoreName">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                کد فروشگاه
+            </label>
+
+            <input id="newStoreCode">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                نام مالک
+            </label>
+
+            <input id="newStoreOwner">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                تلفن
+            </label>
+
+            <input id="newStorePhone">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                آدرس
+            </label>
+
+            <textarea id="newStoreAddress">
+            </textarea>
+
+        </div>
+
+
+        <button
+            class="btn btn-blue full"
+            onclick="createStore()">
+
+            ایجاد فروشگاه
+
+        </button>
+
+        `
+    );
+
+}
+
+
+async function createStore(){
+
+    try{
+
+        const {
+            error
+        } =
+            await supabaseClient
+            .rpc(
+                "create_store",
+                {
+
+                    p_name:
+                        document
+                        .getElementById(
+                            "newStoreName"
+                        )
+                        .value,
+
+                    p_code:
+                        document
+                        .getElementById(
+                            "newStoreCode"
+                        )
+                        .value,
+
+                    p_owner_name:
+                        document
+                        .getElementById(
+                            "newStoreOwner"
+                        )
+                        .value,
+
+                    p_phone:
+                        document
+                        .getElementById(
+                            "newStorePhone"
+                        )
+                        .value,
+
+                    p_address:
+                        document
+                        .getElementById(
+                            "newStoreAddress"
+                        )
+                        .value
+
+                }
+            );
+
+
+        if(error) throw error;
+
+
+        closeModal();
+
+        renderAdmin();
+
+        toast(
+            "فروشگاه ایجاد شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+async function changeStoreStatus(
+    id,
+    current
+){
+
+    const next =
+        current==="active"
+        ?"suspended"
+        :
+        current==="suspended"
+        ?"inactive"
+        :"active";
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+        .from("stores")
+        .update({
+            status:next
+        })
+        .eq("id",id);
+
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    renderAdmin();
+
+    toast(
+        "وضعیت فروشگاه تغییر کرد"
+    );
+
+}
+
+
+/* =====================================================
+   ADMIN USERS
+===================================================== */
+
+async function renderAdminUsers(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("profiles")
+        .select(`
+            id,
+            username,
+            full_name,
+            role,
+            store_id,
+            is_active
+        `)
+        .order(
+            "username"
+        );
+
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data:stores
+    } =
+        await supabaseClient
+        .from("stores")
+        .select(
+            "id,name,code"
+        );
+
+
+    document
+        .getElementById(
+            "adminContent"
+        )
+        .innerHTML=`
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    کاربران
+                </h2>
+
+                <button
+                    class="btn btn-blue"
+                    onclick="newUserModal()">
+
+                    ＋ کاربر جدید
+
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                نام کاربری
+                            </th>
+
+                            <th>
+                                نام
+                            </th>
+
+                            <th>
+                                فروشگاه
+                            </th>
+
+                            <th>
+                                نقش
+                            </th>
+
+                            <th>
+                                وضعیت
+                            </th>
+
+                            <th>
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${(data||[])
+                        .map(function(user){
+
+                            const store =
+                                (stores||[])
+                                .find(
+                                    s=>s.id===
+                                    user.store_id
+                                );
+
+
+                            return `
+
+                                <tr>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.username
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.full_name||""
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            store?.name||"مدیریت مرکزی"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.role
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${
+                                            user.is_active
+                                            ?"فعال"
+                                            :"غیرفعال"
+                                        }
+                                    </td>
+
+                                    <td>
+
+                                        ${
+                                            user.role==="store_user"
+
+                                            ?
+
+                                            `<button
+                                                class="btn"
+                                                onclick="toggleUser(
+                                                    '${user.id}',
+                                                    ${user.is_active}
+                                                )">
+
+                                                تغییر وضعیت
+
+                                            </button>`
+
+                                            :
+
+                                            ""
+
+                                        }
+
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }).join("")}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+async function toggleUser(
+    id,
+    active
+){
+
+    const {
+        error
+    } =
+        await supabaseClient
+        .from("profiles")
+        .update({
+            is_active:!active
+        })
+        .eq("id",id);
+
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    renderAdmin();
+
+    toast(
+        "وضعیت کاربر تغییر کرد"
+    );
+
+}
+
+
+function newUserModal(
+    storeId=null
+){
+
+    showModal(
+        "ایجاد کاربر فروشگاه",
+
+        `
+
+        <div class="field">
+
+            <label>
+                فروشگاه
+            </label>
+
+            <select id="userStore">
+
+                ${state.adminStores?.map(
+                    function(s){
+
+                        return `
+
+                            <option
+                                value="${s.id}"
+                                ${
+                                    s.id===storeId
+                                    ?"selected":""
+                                }>
+
+                                ${escapeHtml(
+                                    s.name
+                                )}
+
+                            </option>
+
+                        `;
+
+                    }
+                ).join("") || ""}
+
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                نام کاربری
+            </label>
+
+            <input
+                id="newUsername"
+                placeholder="bizad01">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                رمز عبور
+            </label>
+
+            <input
+                id="newPassword"
+                type="password">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                نام کاربر
+            </label>
+
+            <input id="newFullName">
+
+        </div>
+
+
+        <button
+            class="btn btn-blue full"
+            onclick="createStoreUser()">
+
+            ایجاد کاربر
+
+        </button>
+
+        `
+    );
+
+
+    loadAdminStoresForUser();
+
+}
+
+
+async function loadAdminStoresForUser(){
+
+    const {
+        data
+    } =
+        await supabaseClient
+        .from("stores")
+        .select(
+            "id,name,code"
+        )
+        .order("name");
+
+
+    state.adminStores=data || [];
+
+
+    const select =
+        document.getElementById(
+            "userStore"
+        );
+
+
+    if(!select) return;
+
+
+    select.innerHTML =
+        state.adminStores
+        .map(function(s){
+
+            return `
+
+                <option value="${s.id}">
+
+                    ${escapeHtml(
+                        s.name
+                    )}
+
+                </option>
+
+            `;
+
+        }).join("");
+
+}
+
+
+async function createStoreUser(){
+
+    try{
+
+        const {
+            data
+        } =
+            await supabaseClient
+            .auth
+            .getSession();
+
+
+        const session =
+            data.session;
+
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/functions/v1/biza-admin",
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_PUBLISHABLE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            session.access_token
+
+                    },
+
+                    body:JSON.stringify({
+
+                        action:
+                            "create_store_user",
+
+                        store_id:
+                            document
+                            .getElementById(
+                                "userStore"
+                            )
+                            .value,
+
+                        username:
+                            document
+                            .getElementById(
+                                "newUsername"
+                            )
+                            .value,
+
+                        password:
+                            document
+                            .getElementById(
+                                "newPassword"
+                            )
+                            .value,
+
+                        full_name:
+                            document
+                            .getElementById(
+                                "newFullName"
+                            )
+                            .value
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(!response.ok || !result.ok){
+
+            throw new Error(
+                result.error ||
+                "ساخت کاربر ناموفق بود"
+            );
+
+        }
+
+
+        closeModal();
+
+        renderAdmin();
+
+        toast(
+            "کاربر ایجاد شد"
+        );
+
+    }
+    catch(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ADMIN LOGS
+===================================================== */
+
+async function renderAdminLogs(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("audit_logs")
+        .select("*")
+        .order(
+            "created_at",
+            {ascending:false}
+        )
+        .limit(200);
+
+
+    if(error){
+
+        toast(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "adminContent"
+        )
+        .innerHTML=`
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    گزارش فعالیت
+                </h2>
+
+            </div>
+
+
+            ${data?.length
+
+            ?
+
+            `
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                عملیات
+                            </th>
+
+                            <th>
+                                نوع
+                            </th>
+
+                            <th>
+                                شناسه
+                            </th>
+
+                            <th>
+                                زمان
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${data.map(function(log){
+
+                            return `
+
+                                <tr>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            log.action
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            log.entity_type
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            log.entity_id||""
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${new Date(
+                                            log.created_at
+                                        ).toLocaleString(
+                                            "fa-IR"
+                                        )}
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }).join("")}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            `
+
+            :
+
+            `<div class="empty">
+                فعالیتی ثبت نشده است.
+            </div>`
+
+            }
+
+        </section>
+
+    `;
+
+}
+
+
+/* =====================================================
+   BACKGROUND NETWORK
+===================================================== */
+
+const canvas =
+    document.getElementById(
+        "network"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+let nodes=[];
+
+
+function resizeCanvas(){
+
+    canvas.width=
+        window.innerWidth;
+
+    canvas.height=
+        window.innerHeight;
+
+
+    nodes=[];
+
+
+    const count =
+        Math.min(
+            75,
+            Math.floor(
+                window.innerWidth *
+                window.innerHeight /
+                15000
+            )
+        );
+
+
+    for(let i=0;i<count;i++){
+
+        nodes.push({
+
+            x:Math.random()*
+                canvas.width,
+
+            y:Math.random()*
+                canvas.height,
+
+            vx:(Math.random()-.5)*.28,
+
+            vy:(Math.random()-.5)*.28,
+
+            r:Math.random()*1.8+.6,
+
+            pulse:Math.random()*Math.PI*2
+
+        });
+
+    }
+
+}
+
+
+function animateNetwork(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    for(let i=0;i<nodes.length;i++){
+
+        const a=nodes[i];
+
+        a.x+=a.vx;
+        a.y+=a.vy;
+
+        a.pulse+=.025;
+
+
+        if(a.x<0 || a.x>canvas.width)
+            a.vx*=-1;
+
+        if(a.y<0 || a.y>canvas.height)
+            a.vy*=-1;
+
+
+        for(let j=i+1;j<nodes.length;j++){
+
+            const b=nodes[j];
+
+            const dx=a.x-b.x;
+            const dy=a.y-b.y;
+
+            const distance =
+                Math.sqrt(
+                    dx*dx+dy*dy
+                );
+
+
+            if(distance<145){
+
+                const alpha =
+                    (1-distance/145)*.28;
+
+                ctx.strokeStyle=
+                    "rgba(0,168,255,"+
+                    alpha+
+                    ")";
+
+                ctx.lineWidth=.7;
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    a.x,
+                    a.y
+                );
+
+                ctx.lineTo(
+                    b.x,
+                    b.y
+                );
+
+                ctx.stroke();
+
+            }
+
+        }
+
+
+        const pulse =
+            Math.sin(a.pulse)*.5+.5;
+
+        ctx.fillStyle=
+            "rgba(0,168,255,"+
+            (.35+pulse*.45)+
+            ")";
+
+        ctx.shadowBlur=
+            8+pulse*7;
+
+        ctx.shadowColor=
+            "#00a8ff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            a.x,
+            a.y,
+            a.r+pulse*.8,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.shadowBlur=0;
+
+    }
+
+
+    requestAnimationFrame(
+        animateNetwork
+    );
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+resizeCanvas();
+animateNetwork();
+
+
+/* =====================================================
+   START
+===================================================== */
+
+initialize();
+
+</script>
+
+</body>
+</html>
