@@ -1,13 +1,5 @@
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BIZA MARKET</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<div id="app"><div class="splash"><b>BIZA MARKET</b><span>در حال اتصال…</span></div></div>
-<script type="module" src="js/app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BIZA MARKET</title><link rel="stylesheet" href="css/app.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+<div id="app">
+<section id="loginView" class="view"><div class="card auth-card"><div class="brand">BIZA <span>MARKET</span></div><p class="muted">مدیریت فروشگاه</p><form id="loginForm"><input id="loginId" placeholder="ایمیل یا نام کاربری" autocomplete="username" required><input id="loginPassword" type="password" placeholder="رمز عبور" autocomplete="current-password" required><button>ورود</button><div id="loginError" class="error"></div></form></div></section>
+<section id="mainView" class="view hidden"><header><div><div id="storeName" class="store-name">BIZA MARKET</div><div id="dbStatus" class="status">در حال اتصال...</div></div><div class="header-actions"><span id="networkStatus">Online</span><button id="logoutBtn" class="ghost">خروج</button></div></header><main><div id="homeTab" class="tab-page"></div><div id="saleTab" class="tab-page hidden"></div><div id="inventoryTab" class="tab-page hidden"></div><div id="adminTab" class="tab-page hidden"></div></main><nav><button data-tab="sale">فروش</button><button data-tab="home" class="active">خانه</button><button data-tab="inventory">انبار</button><button data-tab="admin" id="adminNav" class="hidden">مدیریت</button></nav></section></div>
+<div id="toast"></div><script src="js/app.js"></script></body></html>

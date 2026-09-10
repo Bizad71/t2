@@ -1,76 +1,41 @@
 # BIZA MARKET
 
-نسخه پایه واقعی و Mobile First بر اساس مشخصات فایل پروژه شما ساخته شده است. این ZIP شامل Frontend، CSS، JavaScript، Migration امن Supabase و مستندات Binary Eye است.
+نسخه آماده اجرای BIZA MARKET با Supabase، بدون Secret در Frontend.
 
-## مهم
-این پروژه به Supabase موجود شما وصل می‌شود؛ کلید Service Role هرگز داخل Frontend قرار نمی‌گیرد. چون من به پروژه Supabase شما دسترسی مستقیم ندارم، نمی‌توانم Migration را روی دیتابیس واقعی اجرا یا تست شبکه‌ای انجام دهم.
+## وضعیت فعلی و اصلاح اصلی
+ساختار موجود دو مدل قدیمی `shops/shop_id` و مدل جدید `stores/store_id` را هم‌زمان داشت. در خروجی دیتابیس، `profiles` دارای `store_id` است اما چند Function قدیمی مثل `current_shop_id()` از `shop_id` استفاده می‌کردند؛ همین split می‌تواند باعث شود رکورد ثبت شود ولی بعد از Refresh/ورود مجدد در سایت دیده نشود. Migration جدید `current_shop_id()` و `get_my_user_data()` را به `store_id/stores` هماهنگ می‌کند. همچنین فروش جدید باید Batch مشخص داشته باشد؛ RPC `create_sale` این الزام را در خود Database اعمال می‌کند.
 
 ## اجرا
-1. `config.example.js` را به `js/config.js` کپی کنید.
-2. `SUPABASE_URL` و Anon/Publishable Key را وارد کنید.
-3. فایل‌ها را روی یک وب‌سرور HTTPS یا localhost اجرا کنید. برای استفاده روزمره، HTTPS توصیه می‌شود.
-4. `supabase/migrations/001_biza_market_safe.sql` را در SQL Editor پروژه Supabase اجرا کنید.
-5. یک کاربر Auth بسازید و برای او در `public.profiles` نقش `admin` یا `store_user` و در حالت فروشگاهی `store_id` قرار دهید.
-6. برای Store User مجوزهای لازم را در `public.user_permissions` بدهید.
+1. پوشه را روی یک وب‌سرور ساده یا GitHub Pages/Netlify/Cloudflare Pages قرار دهید. برای تست محلی: `python -m http.server 8080` داخل پوشه.
+2. فایل `supabase/migrations/20260910_biza_hardening.sql` را در SQL Editor پروژه Supabase اجرا کنید.
+3. Authentication > Email را فعال کنید.
+4. یک کاربر Admin بسازید و در جدول `public.profiles` نقش او را `admin` کنید؛ برای اولین Admin می‌توان از SQL Editor و Service Role/داشبورد Supabase استفاده کرد.
+5. برای ساخت Store User از Edge Function موجود استفاده کنید. قبل از deploy، Secret `SUPABASE_SERVICE_ROLE_KEY` را فقط در Secrets محیط Supabase Function تنظیم کنید.
+6. Edge Function را با نام `admin-create-user` deploy کنید.
 
-## چرا Migration امن است؟
-طبق Snapshot ارائه‌شده، جدول‌های اصلی از قبل وجود دارند: products، profiles، stores، inventory_batches، inventory_transactions، sales، sale_items، invoices، store_counters، store_settings و audit_logs. Migration آن‌ها را DROP نمی‌کند؛ فقط index/function/RLS لازم را ارتقا می‌دهد. Snapshot همچنین نشان می‌دهد Functionهای قدیمی با نام‌های جدیدتر و legacy مانند `create_product_with_stock`/`receive_stock`/`register_sale` هم‌زمان وجود داشته‌اند؛ این نسخه از مسیر `products` + `inventory_batches` + `create_sale` استفاده می‌کند.
+## اتصال
+URL و Publishable Key در `js/app.js` قرار گرفته‌اند. Publishable/anon key برای Frontend است؛ Service Role Key هرگز در Frontend قرار نگرفته است.
 
-## منطق Batch
-هر ورود موجودی یک Batch جدید می‌سازد. در فروش، اگر یک Batch فعال باشد انتخاب خودکار است؛ اگر چند Batch فعال باشد فروشنده باید Batch/قیمت را انتخاب کند. فروش بیش از موجودی Fail می‌شود. لغو فروش دقیقاً موجودی Batchهای همان فروش را برمی‌گرداند.
+## Auth و Refresh
+Supabase client با `persistSession`, `autoRefreshToken` و `detectSessionInUrl` ساخته شده و `onAuthStateChange` وضعیت session را دنبال می‌کند. Password در localStorage ذخیره نمی‌شود.
 
-## Session
-Supabase Auth با `persistSession` و `autoRefreshToken` استفاده می‌شود و در شروع برنامه `getSession()` بررسی می‌شود. رمز عبور در localStorage ذخیره نمی‌شود.
+## Barcode / Binary Eye
+دکمه اسکن از deep link رسمی Binary Eye استفاده می‌کند: `binaryeye://scan?ret=...`. Binary Eye امکان باز شدن با URI و برگرداندن مقدار اسکن‌شده با `ret` و placeholder `{RESULT}` را مستند کرده است. بعد از برگشت، مقدار داخل همان input قرار می‌گیرد و state فیلد از طریق `sessionStorage` حفظ می‌شود. این پروژه از getUserMedia یا camera scanner داخلی استفاده نمی‌کند.
 
-## Binary Eye
-Binary Eye طبق مستندات رسمی خود Deep Link زیر را پشتیبانی می‌کند:
-`binaryeye://scan?ret=<encoded-return-uri>`
-و مقدار اسکن‌شده با `{RESULT}` در URI برگشت قرار می‌گیرد. همچنین Intent اندرویدی `com.google.zxing.client.android.SCAN` را پشتیبانی می‌کند.
+## نکته Android/Web
+باز کردن custom URI توسط مرورگر به نصب بودن Binary Eye و سیاست مرورگر/Android وابسته است. اگر مرورگر اجازه اجرای URI را ندهد، ورود دستی بارکد همچنان فعال است. برای اجرای کاملاً native و تضمین‌شده، wrapper Android با Intent نیز می‌تواند ساخته شود.
 
-در این Web App از Deep Link استفاده شده است:
-1. کاربر Scan را می‌زند.
-2. `binaryeye://scan?...` باز می‌شود.
-3. Binary Eye فقط Raw Barcode را می‌خواند.
-4. بعد از Scan، URI برگشت، Barcode را به سایت برمی‌گرداند.
-5. سایت Barcode را فقط در دیتابیس خودش جستجو می‌کند.
+## قابلیت‌ها
+- Login و Session persistence
+- Multi-tenant با store_id و RLS موجود
+- Product و Barcode
+- Batch و چند قیمت
+- فروش transactional با انتخاب Batch
+- Invoice و Cancel Sale موجود در schema
+- Dashboard واقعی
+- Audit log موجود در schema/RPCهای فعلی
+- Admin/Store/User foundation
+- Mobile-first UI با Blue/Black و Node/SVG سبک
 
-محدودیت: مرورگر وب به تنهایی کنترل کامل lifecycle یک Popup واقعی هنگام خروج به اپ خارجی را ندارد؛ در این نسخه state بارکد در `sessionStorage` نگهداری می‌شود. اگر پروژه داخل Android WebView/Wrapper قرار گیرد، می‌توان Intent را در لایه Native دقیق‌تر کنترل کرد.
-
-## امنیت
-- RLS بر اساس `private.current_user_store_id()` و نقش Admin اعمال شده است.
-- Functionهای حساس `SECURITY DEFINER` هستند و Store/Permission را داخل DB بررسی می‌کنند.
-- Service Role Key فقط باید در محیط سرور/Edge Function باشد.
-- Barcode به‌تنهایی مجوز دسترسی نیست.
-
-## تست ضروری قبل از استفاده عملی
-- Login → Refresh → Logout → Login
-- ایجاد کالا → Refresh → Login مجدد → مشاهده کالا
-- دو Store و عدم مشاهده اطلاعات متقابل
-- دو Batch با قیمت متفاوت و فروش از هر دو
-- فروش بیشتر از موجودی باید Fail شود
-- Cancel باید موجودی همان Batchها را برگرداند
-- گزارش‌ها فقط داده واقعی DB را نشان دهند
-
-## Binary Eye منابع
-مستندات رسمی Binary Eye: https://github.com/markusfisch/BinaryEye
-نسخه‌های F-Droid: https://f-droid.org/packages/de.markusfisch.android.binaryeye/
-
-## ساختار
-- `index.html`
-- `config.example.js`
-- `js/app.js`
-- `js/config.js`
-- `css/style.css`
-- `supabase/migrations/001_biza_market_safe.sql`
-
-
-## اتصال تستی آماده است
-`js/config.js` با Project URL و Publishable Key تستی تنظیم شده است.
-کلید Publishable برای کد مرورگر قابل استفاده است؛ امنیت داده‌ها باید با RLS و مجوزهای دیتابیس کنترل شود.
-قبل از تست کامل، migration موجود در `supabase/migrations/001_biza_market_safe.sql` را در SQL Editor پروژه اجرا کنید.
-
-
-## نسخه اصلاح‌شده
-- خطای اتصال `config.js`/`app.js` اصلاح شده است.
-- ورود با `profiles.email` انجام می‌شود و به RPC اضافی `get_login_email` وابسته نیست.
-- وضعیت اتصال دیتابیس از نتیجه واقعی RPCها نمایش داده می‌شود.
+## محدودیت مهم
+این محیط به دیتابیس واقعی شما دسترسی مدیریتی/Service Role ندارد؛ بنابراین migration و Frontend را می‌توان ساخت و syntax/ساختار را بررسی کرد، اما اجرای واقعی روی پروژه Supabase و تست دور کامل Auth/RLS/Transaction نیازمند اجرای migration روی همان پروژه است. هیچ داده‌ای در این بسته Mock نشده است.
