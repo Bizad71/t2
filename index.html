@@ -768,614 +768,585 @@ td{
 
 <div id="app" class="app">
 
-  <!-- LOGIN -->
-  <section id="loginPage" class="login-page">
-    <div class="login-card glass">
-      <div class="logo">BIZA</div>
-      <div class="logo-sub">SaaS MANAGEMENT PLATFORM</div>
-
-      <form id="loginForm">
-        <div class="field">
-          <label>نام کاربری</label>
-          <input id="loginUsername" autocomplete="username" required>
-        </div>
-
-        <div class="field">
-          <label>رمز عبور</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" required>
-        </div>
-
-        <button id="loginBtn" class="primary-btn" type="submit">
-          ورود به سیستم
-        </button>
-
-        <div id="loginError" class="login-error"></div>
-      </form>
-    </div>
-  </section>
-
-
-  <!-- STORE -->
-  <section id="storePage" class="hidden">
-
-    <header class="topbar">
-      <div>
-        <div class="brand-small">BIZA</div>
-        <div id="storeUserInfo" class="user-info"></div>
-      </div>
-
-      <button class="danger-btn" onclick="logout()">خروج</button>
-    </header>
-
-    <main class="main">
-
-      <div class="page-title">
-        <span id="storeNameTitle">فروشگاه</span>
-      </div>
-
-      <div class="cards">
-
-        <div class="stat-card glass">
-          <div class="stat-title">تعداد کالا</div>
-          <div id="statProducts" class="stat-value blue">0</div>
-        </div>
-
-        <div class="stat-card glass">
-          <div class="stat-title">موجودی</div>
-          <div id="statInventory" class="stat-value green">0</div>
-        </div>
-
-        <div class="stat-card glass">
-          <div class="stat-title">فروش امروز</div>
-          <div id="statSales" class="stat-value purple">0</div>
-        </div>
-
-        <div class="stat-card glass">
-          <div class="stat-title">تعداد فاکتور</div>
-          <div id="statInvoices" class="stat-value red">0</div>
-        </div>
-
-      </div>
-
-      <div class="dashboard-actions">
-
-        <button class="action-card glass" onclick="openChart('sales')">
-          <span>گزارش فروش</span>
-        </button>
-
-        <button class="action-card glass" onclick="openProductModal()">
-          <span>ثبت کالا</span>
-        </button>
-
-        <button class="action-card glass" onclick="openStockModal()">
-          <span>ورود به انبار</span>
-        </button>
-
-        <button class="action-card glass" onclick="openSaleModal()">
-          <span>فروش جدید</span>
-        </button>
-
-      </div>
-
-      <section id="homeSection" class="section glass">
-        <div class="section-head">
-          <div class="section-title">آخرین فروش‌ها</div>
-          <button class="neon-btn" onclick="loadStoreData()">بروزرسانی</button>
-        </div>
-
-        <div id="recentSales"></div>
-      </section>
-
-      <section id="inventorySection" class="section glass hidden">
-        <div class="section-head">
-          <div class="section-title">انبار</div>
-          <button class="neon-btn" onclick="openStockModal()">ورود کالا</button>
-        </div>
-
-        <div id="inventoryTable"></div>
-      </section>
-
-      <section id="productsSection" class="section glass hidden">
-        <div class="section-head">
-          <div class="section-title">کالاها</div>
-          <button class="neon-btn" onclick="openProductModal()">کالای جدید</button>
-        </div>
-
-        <div id="productsTable"></div>
-      </section>
-
-    </main>
-
-    <nav class="bottom-nav glass">
-
-      <button id="navSale" class="nav-btn" onclick="showStoreSection('sale')">
-        <div class="nav-ball"></div>
-        <div class="nav-label">فروش</div>
-      </button>
-
-      <button id="navHome" class="nav-btn active" onclick="showStoreSection('home')">
-        <div class="nav-ball"></div>
-        <div class="nav-label">خانه</div>
-      </button>
-
-      <button id="navInventory" class="nav-btn" onclick="showStoreSection('inventory')">
-        <div class="nav-ball"></div>
-        <div class="nav-label">انبار</div>
-      </button>
-
-    </nav>
-
-  </section>
-
-
-  <!-- ADMIN -->
-  <section id="adminPage" class="hidden admin-shell">
-
-    <header class="topbar">
-      <div>
-        <div class="brand-small">BIZA ADMIN</div>
-        <div class="user-info">Server Management</div>
-      </div>
-
-      <button class="danger-btn" onclick="logout()">خروج</button>
-    </header>
-
-    <div class="admin-grid">
-
-      <aside class="admin-sidebar glass">
-
-        <div class="server-status">
-          <span class="status-dot"></span>
-          سیستم آنلاین
-        </div>
-
-        <div class="admin-nav">
-
-          <button id="adminNavDashboard" class="active"
-                  onclick="showAdminSection('dashboard')">
-            داشبورد
-          </button>
-
-          <button id="adminNavStores"
-                  onclick="showAdminSection('stores')">
-            فروشگاه‌ها
-          </button>
-
-          <button id="adminNavUsers"
-                  onclick="showAdminSection('users')">
-            کاربران
-          </button>
-
-          <button id="adminNavLogs"
-                  onclick="showAdminSection('logs')">
-            گزارش رویدادها
-          </button>
-
-        </div>
-
-      </aside>
-
-      <main class="admin-content">
-
-        <section id="adminDashboardSection">
-
-          <div class="page-title">
-            مدیریت <span>BIZA SaaS</span>
-          </div>
-
-          <div class="cards">
-
-            <div class="stat-card glass">
-              <div class="stat-title">فروشگاه‌ها</div>
-              <div id="adminStoreCount" class="stat-value blue">0</div>
-            </div>
-
-            <div class="stat-card glass">
-              <div class="stat-title">فروشگاه فعال</div>
-              <div id="adminActiveStoreCount" class="stat-value green">0</div>
-            </div>
-
-            <div class="stat-card glass">
-              <div class="stat-title">کاربران فروشگاه</div>
-              <div id="adminUserCount" class="stat-value purple">0</div>
-            </div>
-
-            <div class="stat-card glass">
-              <div class="stat-title">رویدادها</div>
-              <div id="adminLogCount" class="stat-value red">0</div>
-            </div>
-
-          </div>
-
-          <section class="section glass">
-            <div class="section-head">
-              <div class="section-title">وضعیت سیستم</div>
-            </div>
-
-            <div id="adminSystemStatus">
-              در حال دریافت اطلاعات...
-            </div>
-          </section>
-
-        </section>
-
-
-        <section id="adminStoresSection" class="hidden">
-
-          <div class="page-title">مدیریت <span>فروشگاه‌ها</span></div>
-
-          <div class="section glass">
-
-            <div class="section-head">
-              <div class="section-title">فروشگاه‌ها</div>
-              <button class="neon-btn" onclick="openStoreModal()">
-                فروشگاه جدید
-              </button>
-            </div>
-
-            <div id="adminStoresTable"></div>
-
-          </div>
-
-        </section>
-
-
-        <section id="adminUsersSection" class="hidden">
-
-          <div class="page-title">مدیریت <span>کاربران</span></div>
-
-          <div class="section glass">
-
-            <div class="section-head">
-              <div class="section-title">کاربران فروشگاه‌ها</div>
-              <button class="neon-btn" onclick="openUserModal()">
-                کاربر جدید
-              </button>
-            </div>
-
-            <div id="adminUsersTable"></div>
-
-          </div>
-
-        </section>
-
-
-        <section id="adminLogsSection" class="hidden">
-
-          <div class="page-title">گزارش <span>رویدادها</span></div>
-
-          <div class="section glass">
-            <div id="adminLogsTable"></div>
-          </div>
-
-        </section>
-
-      </main>
-    </div>
-
-  </section>
-
-</div>
-
-
-<!-- CHART -->
-<div id="chartScreen" class="chart-screen">
-
-  <div class="chart-box glass">
-
-    <button class="danger-btn close-chart" onclick="closeChart()">
-      بستن
-    </button>
-
-    <div class="page-title" id="chartTitle">
-      گزارش
-    </div>
-
-    <div class="donut"></div>
-
-    <div class="cards">
-
-      <div class="stat-card glass">
-        <div class="stat-title">فروش</div>
-        <div id="chartSales" class="stat-value blue">0</div>
-      </div>
-
-      <div class="stat-card glass">
-        <div class="stat-title">فاکتور</div>
-        <div id="chartInvoices" class="stat-value green">0</div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- PRODUCT MODAL -->
-<div id="productModal" class="modal">
-
-  <div class="modal-box glass">
-
-    <div class="modal-head">
-      <div class="modal-title">ثبت کالا</div>
-      <button class="close-btn" onclick="closeModal('productModal')">×</button>
-    </div>
-
-    <form id="productForm">
-
-      <div class="form-grid">
-
-        <div class="field">
-          <label>بارکد</label>
-          <input id="productBarcode" required>
-        </div>
-
-        <div class="field">
-          <label>واحد</label>
-          <input id="productUnit" value="عدد">
-        </div>
-
-        <div class="field full">
-          <label>نام کالا</label>
-          <input id="productName" required>
-        </div>
-
-        <div class="field full">
-          <label>توضیحات</label>
-          <textarea id="productDescription"></textarea>
-        </div>
-
-      </div>
-
-      <button class="primary-btn" type="submit">
-        ذخیره کالا
-      </button>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- STOCK MODAL -->
-<div id="stockModal" class="modal">
-
-  <div class="modal-box glass">
-
-    <div class="modal-head">
-      <div class="modal-title">ورود کالا به انبار</div>
-      <button class="close-btn" onclick="closeModal('stockModal')">×</button>
-    </div>
-
-    <form id="stockForm">
-
-      <div class="field">
-
-        <label>بارکد کالا</label>
-
-        <div class="barcode-row">
-
-          <input
-            id="stockBarcode"
-            autocomplete="off"
-            inputmode="numeric"
-            placeholder="بارکد را وارد یا اسکن کنید"
-            required
-          >
-
-          <button
-            id="binaryEyeBtn"
-            class="scan-btn"
-            type="button"
-            onclick="scanWithBinaryEye()">
-            اسکن با Binary Eye
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>نام کالا</label>
-
-        <input
-          id="stockProductName"
-          placeholder="نام کالا را وارد کنید"
-          required
-        >
-
-      </div>
-
-
-      <div class="form-grid">
-
-        <div class="field">
-          <label>تعداد</label>
-          <input
-            id="stockQuantity"
-            type="number"
-            min="0.01"
-            step="any"
-            required
-          >
-        </div>
-
-        <div class="field">
-          <label>قیمت خرید</label>
-          <input
-            id="stockPurchasePrice"
-            type="number"
-            min="0"
-            step="any"
-            required
-          >
-        </div>
-
-        <div class="field">
-          <label>قیمت فروش</label>
-          <input
-            id="stockSalePrice"
-            type="number"
-            min="0"
-            step="any"
-            required
-          >
-        </div>
-
-        <div class="field">
-          <label>توضیحات</label>
-          <input id="stockNote">
-        </div>
-
-      </div>
-
-
-      <button
-        id="stockSubmitBtn"
-        class="primary-btn"
-        type="submit">
-        ثبت کالا و ورود به انبار
-      </button>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- SALE MODAL -->
-<div id="saleModal" class="modal">
-
-  <div class="modal-box glass">
-
-    <div class="modal-head">
-      <div class="modal-title">فروش جدید</div>
-      <button class="close-btn" onclick="closeModal('saleModal')">×</button>
-    </div>
-
-    <div class="field">
-      <label>بارکد کالا</label>
-      <input id="saleBarcode" placeholder="بارکد را وارد یا اسکن کنید">
-    </div>
-
-    <div id="saleItems"></div>
-
-    <div class="cart-total">
-      <span>جمع کل</span>
-      <span id="saleTotal">0</span>
-    </div>
-
-    <div class="field" style="margin-top:12px">
-      <label>تخفیف</label>
-      <input id="saleDiscount" type="number" min="0" value="0">
-    </div>
-
-    <button class="primary-btn" onclick="checkout()">
-      ثبت فروش و صدور فاکتور
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- STORE MODAL -->
-<div id="storeModal" class="modal">
-
-  <div class="modal-box glass">
-
-    <div class="modal-head">
-      <div class="modal-title">ثبت فروشگاه</div>
-      <button class="close-btn" onclick="closeModal('storeModal')">×</button>
-    </div>
-
-    <form id="storeForm">
-
-      <div class="form-grid">
-
-        <div class="field">
-          <label>نام فروشگاه</label>
-          <input id="newStoreName" required>
-        </div>
-
-        <div class="field">
-          <label>کد فروشگاه</label>
-          <input id="newStoreCode" required>
-        </div>
-
-        <div class="field">
-          <label>نام مالک</label>
-          <input id="newStoreOwner">
-        </div>
-
-        <div class="field">
-          <label>تلفن</label>
-          <input id="newStorePhone">
-        </div>
-
-        <div class="field full">
-          <label>آدرس</label>
-          <textarea id="newStoreAddress"></textarea>
-        </div>
-
-      </div>
-
-      <button class="primary-btn" type="submit">
-        ایجاد فروشگاه
-      </button>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- USER MODAL -->
-<div id="userModal" class="modal">
-
-  <div class="modal-box glass">
-
-    <div class="modal-head">
-      <div class="modal-title">ایجاد کاربر فروشگاه</div>
-      <button class="close-btn" onclick="closeModal('userModal')">×</button>
-    </div>
-
-    <form id="userForm">
-
-      <div class="field">
-        <label>فروشگاه</label>
-        <select id="newUserStore" required></select>
-      </div>
-
+<section id="loginPage" class="login-page">
+  <div class="login-card glass">
+    <div class="logo">BIZA</div>
+    <div class="logo-sub">SaaS MANAGEMENT PLATFORM</div>
+
+    <form id="loginForm">
       <div class="field">
         <label>نام کاربری</label>
-        <input id="newUsername" pattern="[a-z0-9._-]{3,40}" required>
-      </div>
-
-      <div class="field">
-        <label>نام کامل</label>
-        <input id="newFullName">
+        <input id="loginUsername" autocomplete="username" required>
       </div>
 
       <div class="field">
         <label>رمز عبور</label>
-        <input id="newPassword" type="password" minlength="8" required>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
       </div>
 
-      <button class="primary-btn" type="submit">
-        ایجاد کاربر
+      <button id="loginBtn" class="primary-btn" type="submit">
+        ورود به سیستم
       </button>
 
+      <div id="loginError" class="login-error"></div>
     </form>
+  </div>
+</section>
 
+
+<section id="storePage" class="hidden">
+
+<header class="topbar">
+  <div>
+    <div class="brand-small">BIZA</div>
+    <div id="storeUserInfo" class="user-info"></div>
   </div>
 
+  <button class="danger-btn" onclick="logout()">خروج</button>
+</header>
+
+<main class="main">
+
+<div class="page-title">
+  <span id="storeNameTitle">فروشگاه</span>
+</div>
+
+<div class="cards">
+
+<div class="stat-card glass">
+  <div class="stat-title">تعداد کالا</div>
+  <div id="statProducts" class="stat-value blue">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">موجودی</div>
+  <div id="statInventory" class="stat-value green">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">فروش امروز</div>
+  <div id="statSales" class="stat-value purple">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">تعداد فاکتور</div>
+  <div id="statInvoices" class="stat-value red">0</div>
+</div>
+
+</div>
+
+<div class="dashboard-actions">
+
+<button class="action-card glass" onclick="openChart('sales')">
+  <span>گزارش فروش</span>
+</button>
+
+<button class="action-card glass" onclick="openProductModal()">
+  <span>ثبت کالا</span>
+</button>
+
+<button class="action-card glass" onclick="openStockModal()">
+  <span>ورود به انبار</span>
+</button>
+
+<button class="action-card glass" onclick="openSaleModal()">
+  <span>فروش جدید</span>
+</button>
+
+</div>
+
+<section id="homeSection" class="section glass">
+<div class="section-head">
+  <div class="section-title">آخرین فروش‌ها</div>
+  <button class="neon-btn" onclick="loadStoreData()">بروزرسانی</button>
+</div>
+<div id="recentSales"></div>
+</section>
+
+<section id="inventorySection" class="section glass hidden">
+<div class="section-head">
+  <div class="section-title">انبار</div>
+  <button class="neon-btn" onclick="openStockModal()">ورود کالا</button>
+</div>
+<div id="inventoryTable"></div>
+</section>
+
+<section id="productsSection" class="section glass hidden">
+<div class="section-head">
+  <div class="section-title">کالاها</div>
+  <button class="neon-btn" onclick="openProductModal()">کالای جدید</button>
+</div>
+<div id="productsTable"></div>
+</section>
+
+</main>
+
+<nav class="bottom-nav glass">
+
+<button id="navSale" class="nav-btn" onclick="showStoreSection('sale')">
+  <div class="nav-ball"></div>
+  <div class="nav-label">فروش</div>
+</button>
+
+<button id="navHome" class="nav-btn active" onclick="showStoreSection('home')">
+  <div class="nav-ball"></div>
+  <div class="nav-label">خانه</div>
+</button>
+
+<button id="navInventory" class="nav-btn" onclick="showStoreSection('inventory')">
+  <div class="nav-ball"></div>
+  <div class="nav-label">انبار</div>
+</button>
+
+</nav>
+
+</section>
+
+
+<section id="adminPage" class="hidden admin-shell">
+
+<header class="topbar">
+  <div>
+    <div class="brand-small">BIZA ADMIN</div>
+    <div class="user-info">Server Management</div>
+  </div>
+
+  <button class="danger-btn" onclick="logout()">خروج</button>
+</header>
+
+<div class="admin-grid">
+
+<aside class="admin-sidebar glass">
+
+<div class="server-status">
+  <span class="status-dot"></span>
+  سیستم آنلاین
+</div>
+
+<div class="admin-nav">
+
+<button id="adminNavDashboard" class="active"
+        onclick="showAdminSection('dashboard')">
+  داشبورد
+</button>
+
+<button id="adminNavStores"
+        onclick="showAdminSection('stores')">
+  فروشگاه‌ها
+</button>
+
+<button id="adminNavUsers"
+        onclick="showAdminSection('users')">
+  کاربران
+</button>
+
+<button id="adminNavLogs"
+        onclick="showAdminSection('logs')">
+  گزارش رویدادها
+</button>
+
+</div>
+</aside>
+
+<main class="admin-content">
+
+<section id="adminDashboardSection">
+
+<div class="page-title">
+  مدیریت <span>BIZA SaaS</span>
+</div>
+
+<div class="cards">
+
+<div class="stat-card glass">
+  <div class="stat-title">فروشگاه‌ها</div>
+  <div id="adminStoreCount" class="stat-value blue">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">فروشگاه فعال</div>
+  <div id="adminActiveStoreCount" class="stat-value green">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">کاربران فروشگاه</div>
+  <div id="adminUserCount" class="stat-value purple">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">رویدادها</div>
+  <div id="adminLogCount" class="stat-value red">0</div>
+</div>
+
+</div>
+
+<section class="section glass">
+<div class="section-head">
+  <div class="section-title">وضعیت سیستم</div>
+</div>
+
+<div id="adminSystemStatus">
+  در حال دریافت اطلاعات...
+</div>
+</section>
+
+</section>
+
+
+<section id="adminStoresSection" class="hidden">
+
+<div class="page-title">مدیریت <span>فروشگاه‌ها</span></div>
+
+<div class="section glass">
+
+<div class="section-head">
+  <div class="section-title">فروشگاه‌ها</div>
+  <button class="neon-btn" onclick="openStoreModal()">
+    فروشگاه جدید
+  </button>
+</div>
+
+<div id="adminStoresTable"></div>
+
+</div>
+</section>
+
+
+<section id="adminUsersSection" class="hidden">
+
+<div class="page-title">مدیریت <span>کاربران</span></div>
+
+<div class="section glass">
+
+<div class="section-head">
+  <div class="section-title">کاربران فروشگاه‌ها</div>
+  <button class="neon-btn" onclick="openUserModal()">
+    کاربر جدید
+  </button>
+</div>
+
+<div id="adminUsersTable"></div>
+
+</div>
+</section>
+
+
+<section id="adminLogsSection" class="hidden">
+
+<div class="page-title">گزارش <span>رویدادها</span></div>
+
+<div class="section glass">
+  <div id="adminLogsTable"></div>
+</div>
+
+</section>
+
+</main>
+</div>
+</section>
+
+</div>
+
+
+<div id="chartScreen" class="chart-screen">
+
+<div class="chart-box glass">
+
+<button class="danger-btn close-chart" onclick="closeChart()">
+  بستن
+</button>
+
+<div class="page-title" id="chartTitle">
+  گزارش
+</div>
+
+<div class="donut"></div>
+
+<div class="cards">
+
+<div class="stat-card glass">
+  <div class="stat-title">فروش</div>
+  <div id="chartSales" class="stat-value blue">0</div>
+</div>
+
+<div class="stat-card glass">
+  <div class="stat-title">فاکتور</div>
+  <div id="chartInvoices" class="stat-value green">0</div>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<div id="productModal" class="modal">
+
+<div class="modal-box glass">
+
+<div class="modal-head">
+  <div class="modal-title">ثبت کالا</div>
+  <button class="close-btn" onclick="closeModal('productModal')">×</button>
+</div>
+
+<form id="productForm">
+
+<div class="form-grid">
+
+<div class="field">
+  <label>بارکد</label>
+  <input id="productBarcode" required>
+</div>
+
+<div class="field">
+  <label>واحد</label>
+  <input id="productUnit" value="عدد">
+</div>
+
+<div class="field full">
+  <label>نام کالا</label>
+  <input id="productName" required>
+</div>
+
+<div class="field full">
+  <label>توضیحات</label>
+  <textarea id="productDescription"></textarea>
+</div>
+
+</div>
+
+<button class="primary-btn" type="submit">
+  ذخیره کالا
+</button>
+
+</form>
+</div>
+</div>
+
+
+<div id="stockModal" class="modal">
+
+<div class="modal-box glass">
+
+<div class="modal-head">
+  <div class="modal-title">ورود کالا به انبار</div>
+  <button class="close-btn" onclick="closeModal('stockModal')">×</button>
+</div>
+
+<form id="stockForm">
+
+<div class="field">
+
+<label>بارکد کالا</label>
+
+<div class="barcode-row">
+
+<input
+  id="stockBarcode"
+  autocomplete="off"
+  inputmode="numeric"
+  placeholder="بارکد را وارد یا اسکن کنید"
+  required
+>
+
+<button
+  id="binaryEyeBtn"
+  class="scan-btn"
+  type="button"
+  onclick="scanWithBinaryEye()">
+  اسکن با Binary Eye
+</button>
+
+</div>
+</div>
+
+
+<div class="field">
+
+<label>نام کالا</label>
+
+<input
+  id="stockProductName"
+  placeholder="نام کالا را وارد کنید"
+  required
+>
+
+</div>
+
+
+<div class="form-grid">
+
+<div class="field">
+<label>تعداد</label>
+<input
+  id="stockQuantity"
+  type="number"
+  min="0.01"
+  step="any"
+  required
+>
+</div>
+
+<div class="field">
+<label>قیمت خرید</label>
+<input
+  id="stockPurchasePrice"
+  type="number"
+  min="0"
+  step="any"
+  required
+>
+</div>
+
+<div class="field">
+<label>قیمت فروش</label>
+<input
+  id="stockSalePrice"
+  type="number"
+  min="0"
+  step="any"
+  required
+>
+</div>
+
+<div class="field">
+<label>توضیحات</label>
+<input id="stockNote">
+</div>
+
+</div>
+
+<button
+  id="stockSubmitBtn"
+  class="primary-btn"
+  type="submit">
+  ثبت کالا و ورود به انبار
+</button>
+
+</form>
+</div>
+</div>
+
+
+<div id="saleModal" class="modal">
+
+<div class="modal-box glass">
+
+<div class="modal-head">
+  <div class="modal-title">فروش جدید</div>
+  <button class="close-btn" onclick="closeModal('saleModal')">×</button>
+</div>
+
+<div class="field">
+<label>بارکد کالا</label>
+<input id="saleBarcode" placeholder="بارکد را وارد یا اسکن کنید">
+</div>
+
+<div id="saleItems"></div>
+
+<div class="cart-total">
+<span>جمع کل</span>
+<span id="saleTotal">0</span>
+</div>
+
+<div class="field" style="margin-top:12px">
+<label>تخفیف</label>
+<input id="saleDiscount" type="number" min="0" value="0">
+</div>
+
+<button class="primary-btn" onclick="checkout()">
+ثبت فروش و صدور فاکتور
+</button>
+
+</div>
+</div>
+
+
+<div id="storeModal" class="modal">
+
+<div class="modal-box glass">
+
+<div class="modal-head">
+<div class="modal-title">ثبت فروشگاه</div>
+<button class="close-btn" onclick="closeModal('storeModal')">×</button>
+</div>
+
+<form id="storeForm">
+
+<div class="form-grid">
+
+<div class="field">
+<label>نام فروشگاه</label>
+<input id="newStoreName" required>
+</div>
+
+<div class="field">
+<label>کد فروشگاه</label>
+<input id="newStoreCode" required>
+</div>
+
+<div class="field">
+<label>نام مالک</label>
+<input id="newStoreOwner">
+</div>
+
+<div class="field">
+<label>تلفن</label>
+<input id="newStorePhone">
+</div>
+
+<div class="field full">
+<label>آدرس</label>
+<textarea id="newStoreAddress"></textarea>
+</div>
+
+</div>
+
+<button class="primary-btn" type="submit">
+ایجاد فروشگاه
+</button>
+
+</form>
+</div>
+</div>
+
+
+<div id="userModal" class="modal">
+
+<div class="modal-box glass">
+
+<div class="modal-head">
+<div class="modal-title">ایجاد کاربر فروشگاه</div>
+<button class="close-btn" onclick="closeModal('userModal')">×</button>
+</div>
+
+<form id="userForm">
+
+<div class="field">
+<label>فروشگاه</label>
+<select id="newUserStore" required></select>
+</div>
+
+<div class="field">
+<label>نام کاربری</label>
+<input id="newUsername" pattern="[a-z0-9._-]{3,40}" required>
+</div>
+
+<div class="field">
+<label>نام کامل</label>
+<input id="newFullName">
+</div>
+
+<div class="field">
+<label>رمز عبور</label>
+<input id="newPassword" type="password" minlength="8" required>
+</div>
+
+<button class="primary-btn" type="submit">
+ایجاد کاربر
+</button>
+
+</form>
+</div>
 </div>
 
 
@@ -1399,7 +1370,14 @@ const SUPABASE_PUBLISHABLE_KEY =
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:false
+      }
+    }
   );
 
 
@@ -1637,63 +1615,53 @@ $("loginForm").addEventListener("submit",async e=>{
 
 async function restoreSession(){
 
-  const saved=localStorage.getItem("biza_session");
-
-  if(!saved) return;
-
   try{
 
-    const session=JSON.parse(saved);
-
-    if(
-      !session?.access_token ||
-      !session?.refresh_token
-    ){
-      return;
-    }
-
     const {
-      data:setSessionData,
-      error:setSessionError
-    }=await supabaseClient.auth.setSession({
-      access_token:session.access_token,
-      refresh_token:session.refresh_token
-    });
+      data:sessionData,
+      error:sessionError
+    }=await supabaseClient.auth.getSession();
 
-    if(
-      setSessionError ||
-      !setSessionData?.session
-    ){
+    if(sessionError){
 
       console.error(
-        "Session set error:",
-        setSessionError
+        "Session get error:",
+        sessionError
       );
 
-      localStorage.removeItem("biza_session");
-      localStorage.removeItem("biza_profile");
+      return;
+    }
+
+    if(!sessionData?.session){
 
       return;
     }
 
-    state.session=setSessionData.session;
+    const session=sessionData.session;
 
-    const {
-      data,
-      error
-    }=await supabaseClient.auth.getUser(
-      setSessionData.session.access_token
+    state.session=session;
+
+    localStorage.setItem(
+      "biza_session",
+      JSON.stringify(session)
     );
 
-    if(error || !data?.user){
+    const {
+      data:userData,
+      error:userError
+    }=await supabaseClient.auth.getUser();
 
-      localStorage.removeItem("biza_session");
-      localStorage.removeItem("biza_profile");
+    if(userError || !userData?.user){
+
+      console.error(
+        "User restore error:",
+        userError
+      );
 
       return;
     }
 
-    state.user=data.user;
+    state.user=userData.user;
 
     const {
       data:profile,
@@ -1701,7 +1669,7 @@ async function restoreSession(){
     }=await supabaseClient
       .from("profiles")
       .select("*")
-      .eq("id",data.user.id)
+      .eq("id",userData.user.id)
       .maybeSingle();
 
     if(profileError || !profile){
@@ -1725,31 +1693,40 @@ async function restoreSession(){
 
       await openAdmin();
 
-    }else{
-
-      const {
-        data:store,
-        error:storeError
-      }=await supabaseClient
-        .from("stores")
-        .select("*")
-        .eq("id",profile.store_id)
-        .maybeSingle();
-
-      if(storeError || !store){
-
-        console.error(
-          "Store restore error:",
-          storeError
-        );
-
-        return;
-      }
-
-      state.store=store;
-
-      await openStore();
+      return;
     }
+
+    if(!profile.store_id){
+
+      console.error(
+        "Store ID missing"
+      );
+
+      return;
+    }
+
+    const {
+      data:store,
+      error:storeError
+    }=await supabaseClient
+      .from("stores")
+      .select("*")
+      .eq("id",profile.store_id)
+      .maybeSingle();
+
+    if(storeError || !store){
+
+      console.error(
+        "Store restore error:",
+        storeError
+      );
+
+      return;
+    }
+
+    state.store=store;
+
+    await openStore();
 
   }catch(error){
 
@@ -1768,7 +1745,13 @@ async function restoreSession(){
 supabaseClient.auth.onAuthStateChange(
   async(event,session)=>{
 
-    if(event==="TOKEN_REFRESHED" && session){
+    if(
+      (
+        event==="SIGNED_IN" ||
+        event==="TOKEN_REFRESHED"
+      ) &&
+      session
+    ){
 
       state.session=session;
 
@@ -2106,8 +2089,6 @@ function openProductModal(){
 
 /* =========================================================
    STOCK
-   Binary Eye فقط بارکد را برمی‌گرداند.
-   هیچ SELECT از products هنگام اسکن انجام نمی‌شود.
 ========================================================= */
 
 function normalizeBarcode(value){
@@ -2429,12 +2410,6 @@ $("stockForm").addEventListener(
         "در حال ثبت...";
 
 
-      /*
-        مرحله اول:
-        ایجاد کالا با مشخصات دستی کاربر.
-
-        هیچ جستجویی در products انجام نمی‌شود.
-      */
       const {
         data:productId,
         error:createError
@@ -2463,10 +2438,6 @@ $("stockForm").addEventListener(
       }
 
 
-      /*
-        مرحله دوم:
-        ثبت موجودی برای همان کالای تازه ایجادشده.
-      */
       const {
         data:batchId,
         error:stockError
@@ -2518,10 +2489,6 @@ $("stockForm").addEventListener(
         error
       );
 
-      /*
-        خطای Barcode already exists
-        مستقیماً از دیتابیس نمایش داده می‌شود.
-      */
       toast(
         error?.message ||
         "ثبت کالا و ورود به انبار ناموفق بود"
@@ -3759,14 +3726,7 @@ createNetwork();
 
   await restoreSession();
 
-  /*
-    اگر Binary Eye بعد از اسکن
-    به سایت برگشته باشد، نتیجه در openStore
-    پردازش می‌شود.
-  */
-
 })();
-
 </script>
 
 </body>
