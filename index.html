@@ -573,6 +573,62 @@ td{
   font-weight:800;
 }
 
+/* =========================
+   BINARY EYE / STOCK
+========================= */
+
+.barcode-row{
+  display:grid;
+  grid-template-columns:1fr 145px;
+  gap:8px;
+  align-items:end;
+}
+
+.scan-btn{
+  width:100%;
+  min-height:48px;
+  border:1px solid rgba(0,255,157,.45);
+  background:linear-gradient(
+    135deg,
+    rgba(0,255,157,.10),
+    rgba(0,170,255,.10)
+  );
+  color:#00ffb0;
+  border-radius:13px;
+  transition:.2s;
+}
+
+.scan-btn:hover{
+  border-color:var(--green);
+  box-shadow:0 0 20px rgba(0,255,157,.2);
+}
+
+.stock-product-name{
+  border-color:rgba(0,255,157,.2)!important;
+  color:#00ffb0!important;
+}
+
+.stock-product-name.error{
+  border-color:rgba(255,49,88,.45)!important;
+  color:#ff6682!important;
+}
+
+.stock-status{
+  min-height:20px;
+  margin-top:-5px;
+  margin-bottom:12px;
+  font-size:12px;
+  color:#8490a5;
+}
+
+.stock-status.success{
+  color:#00ffae;
+}
+
+.stock-status.error{
+  color:#ff5574;
+}
+
 .toast{
   position:fixed;
   bottom:90px;
@@ -694,6 +750,14 @@ td{
   .form-grid{grid-template-columns:1fr}
   .full{grid-column:auto}
   .product-row{grid-template-columns:1fr 70px 100px 38px}
+
+  .barcode-row{
+    grid-template-columns:1fr;
+  }
+
+  .scan-btn{
+    min-height:45px;
+  }
 }
 
 .loading{
@@ -1086,8 +1150,49 @@ td{
     <form id="stockForm">
 
       <div class="field">
-        <label>کالا</label>
-        <select id="stockProduct" required></select>
+
+        <label>بارکد کالا</label>
+
+        <div class="barcode-row">
+
+          <input
+            id="stockBarcode"
+            autocomplete="off"
+            inputmode="numeric"
+            placeholder="بارکد را وارد یا اسکن کنید"
+            required
+          >
+
+          <button
+            id="binaryEyeBtn"
+            class="scan-btn"
+            type="button"
+            onclick="scanWithBinaryEye()">
+            اسکن با Binary Eye
+          </button>
+
+        </div>
+
+      </div>
+
+      <div id="stockLookupStatus" class="stock-status"></div>
+
+      <div class="field">
+
+        <label>نام کالا</label>
+
+        <input
+          id="stockProductName"
+          class="stock-product-name"
+          readonly
+          placeholder="پس از وارد کردن بارکد نمایش داده می‌شود"
+        >
+
+        <input
+          id="stockProduct"
+          type="hidden"
+        >
+
       </div>
 
       <div class="form-grid">
@@ -1114,7 +1219,10 @@ td{
 
       </div>
 
-      <button class="primary-btn" type="submit">
+      <button
+        id="stockSubmitBtn"
+        class="primary-btn"
+        type="submit">
         ثبت ورود
       </button>
 
@@ -1701,6 +1809,12 @@ async function openStore(){
   await loadStoreData();
 
   showStoreSection("home");
+
+  /*
+    اگر Binary Eye بعد از اسکن به همین صفحه
+    برگشته باشد، پاپ‌آپ ورود کالا دوباره باز می‌شود.
+  */
+  await handleBinaryEyeReturn();
 }
 
 
@@ -1981,18 +2095,410 @@ function openProductModal(){
    STOCK
 ========================================================= */
 
+/*
+  این تابع برای سازگاری با ساختار قبلی نگه داشته شده.
+  دیگر select استفاده نمی‌شود؛ محصول از طریق بارکد پیدا می‌شود.
+*/
 function populateStockProducts(){
+  return;
+}
 
-  $("stockProduct").innerHTML=
-    `<option value="">انتخاب کالا</option>`+
-    state.products
-      .filter(p=>p.is_active)
-      .map(p=>
-        `<option value="${p.id}">
-          ${escapeHtml(p.name)} — ${escapeHtml(p.barcode)}
-        </option>`
-      )
-      .join("");
+
+/*
+  نرمال‌سازی بارکد
+
+  بعضی اسکنرها ممکن است اعداد فارسی/عربی
+  برگردانند. آنها را به اعداد انگلیسی تبدیل می‌کنیم.
+*/
+function normalizeBarcode(value){
+
+  return String(value || "")
+    .trim()
+    .replace(/[۰-۹]/g,d=>
+      String("۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+    )
+    .replace(/[٠-٩]/g,d=>
+      String("٠١٢٣٤٥٦٧٨٩".indexOf(d))
+    );
+}
+
+
+/*
+  پاک کردن وضعیت پیدا کردن کالا
+*/
+function clearStockProduct(){
+
+  $("stockProduct").value="";
+  $("stockProductName").value="";
+  $("stockProductName").classList.remove("error");
+
+  $("stockLookupStatus").textContent="";
+  $("stockLookupStatus").className="stock-status";
+
+  $("stockSubmitBtn").disabled=true;
+}
+
+
+/*
+  پیدا کردن کالا بر اساس بارکد
+  و محدود کردن جستجو به فروشگاه فعلی.
+*/
+async function lookupStockProduct(){
+
+  const barcode=normalizeBarcode(
+    $("stockBarcode").value
+  );
+
+  $("stockBarcode").value=barcode;
+
+  clearStockProduct();
+
+  if(!barcode){
+    return null;
+  }
+
+  if(!state.store?.id){
+
+    $("stockLookupStatus").textContent=
+      "فروشگاه فعلی مشخص نیست";
+
+    $("stockLookupStatus").className=
+      "stock-status error";
+
+    return null;
+  }
+
+  $("stockLookupStatus").textContent=
+    "در حال پیدا کردن کالا...";
+
+  $("stockLookupStatus").className=
+    "stock-status";
+
+  try{
+
+    /*
+      ابتدا از state استفاده می‌کنیم.
+      چون loadStoreData محصولات همین فروشگاه را
+      قبلاً دریافت کرده است.
+    */
+    let product=state.products.find(
+      p=>
+        normalizeBarcode(p.barcode)===barcode &&
+        p.store_id===state.store.id &&
+        p.is_active
+    );
+
+    /*
+      اگر در state نبود، مستقیماً از دیتابیس
+      همان فروشگاه را بررسی می‌کنیم.
+    */
+    if(!product){
+
+      const {
+        data,
+        error
+      }=await supabaseClient
+        .from("products")
+        .select("*")
+        .eq("store_id",state.store.id)
+        .eq("barcode",barcode)
+        .eq("is_active",true)
+        .maybeSingle();
+
+      if(error) throw error;
+
+      product=data || null;
+    }
+
+    if(!product){
+
+      $("stockProductName").value=
+        "کالا پیدا نشد؛ ابتدا کالا را ثبت کنید";
+
+      $("stockProductName")
+        .classList.add("error");
+
+      $("stockLookupStatus").textContent=
+        "کالا پیدا نشد؛ ابتدا کالا را ثبت کنید";
+
+      $("stockLookupStatus").className=
+        "stock-status error";
+
+      $("stockSubmitBtn").disabled=true;
+
+      return null;
+    }
+
+    $("stockProduct").value=product.id;
+
+    $("stockProductName").value=
+      product.name || "";
+
+    $("stockProductName")
+      .classList.remove("error");
+
+    $("stockLookupStatus").textContent=
+      "کالا پیدا شد";
+
+    $("stockLookupStatus").className=
+      "stock-status success";
+
+    $("stockSubmitBtn").disabled=false;
+
+    /*
+      قیمت‌های فعلی محصول را فقط به عنوان
+      مقدار اولیه فرم قرار می‌دهیم.
+      ثبت نهایی همچنان توسط add_stock انجام می‌شود.
+    */
+    if(
+      !$("stockPurchasePrice").value &&
+      product.current_purchase_price!=null
+    ){
+      $("stockPurchasePrice").value=
+        product.current_purchase_price;
+    }
+
+    if(
+      !$("stockSalePrice").value &&
+      product.current_sale_price!=null
+    ){
+      $("stockSalePrice").value=
+        product.current_sale_price;
+    }
+
+    return product;
+
+  }catch(error){
+
+    console.error(error);
+
+    $("stockLookupStatus").textContent=
+      error.message ||
+      "خطا در پیدا کردن کالا";
+
+    $("stockLookupStatus").className=
+      "stock-status error";
+
+    $("stockSubmitBtn").disabled=true;
+
+    return null;
+  }
+}
+
+
+/*
+  وقتی کاربر بارکد را دستی وارد می‌کند،
+  با خروج از فیلد کالا پیدا می‌شود.
+*/
+$("stockBarcode").addEventListener(
+  "change",
+  async ()=>{
+    await lookupStockProduct();
+  }
+);
+
+
+/*
+  برای بارکدخوان‌های USB/Bluetooth که
+  Enter ارسال می‌کنند.
+*/
+$("stockBarcode").addEventListener(
+  "keydown",
+  async e=>{
+
+    if(e.key!=="Enter") return;
+
+    e.preventDefault();
+
+    await lookupStockProduct();
+
+  }
+);
+
+
+/*
+  ذخیره اطلاعات فرم قبل از رفتن به Binary Eye.
+  این باعث می‌شود تعداد، قیمت‌ها و توضیحات
+  بعد از برگشت از اسکنر از بین نروند.
+*/
+function saveStockDraft(){
+
+  const draft={
+    barcode:$("stockBarcode").value,
+    quantity:$("stockQuantity").value,
+    purchasePrice:$("stockPurchasePrice").value,
+    salePrice:$("stockSalePrice").value,
+    note:$("stockNote").value
+  };
+
+  sessionStorage.setItem(
+    "biza_stock_draft",
+    JSON.stringify(draft)
+  );
+}
+
+
+/*
+  بازیابی فرم ورود کالا بعد از برگشت
+  از Binary Eye.
+*/
+function restoreStockDraft(){
+
+  const saved=
+    sessionStorage.getItem("biza_stock_draft");
+
+  if(!saved) return;
+
+  try{
+
+    const draft=JSON.parse(saved);
+
+    $("stockBarcode").value=
+      draft.barcode || "";
+
+    $("stockQuantity").value=
+      draft.quantity || "";
+
+    $("stockPurchasePrice").value=
+      draft.purchasePrice || "";
+
+    $("stockSalePrice").value=
+      draft.salePrice || "";
+
+    $("stockNote").value=
+      draft.note || "";
+
+  }catch(error){
+
+    console.error(
+      "Stock draft restore:",
+      error
+    );
+  }
+
+  sessionStorage.removeItem(
+    "biza_stock_draft"
+  );
+}
+
+
+/*
+  باز کردن Binary Eye.
+
+  Binary Eye نتیجه اسکن را با {RESULT}
+  داخل آدرس برگشت قرار می‌دهد.
+*/
+function scanWithBinaryEye(){
+
+  if(!state.store?.id){
+
+    toast("فروشگاه فعلی مشخص نیست");
+    return;
+  }
+
+  saveStockDraft();
+
+  /*
+    آدرس فعلی صفحه را به عنوان callback استفاده می‌کنیم.
+    پارامتر binaryEyeResult بعد از اسکن مقدار بارکد را می‌گیرد.
+  */
+  const callbackUrl=
+    new URL(window.location.href);
+
+  callbackUrl.searchParams.set(
+    "binaryEyeResult",
+    "{RESULT}"
+  );
+
+  callbackUrl.hash="";
+
+  const binaryEyeUrl=
+    "binaryeye://scan?ret="+
+    encodeURIComponent(
+      callbackUrl.toString()
+    );
+
+  /*
+    انتقال به Binary Eye
+  */
+  window.location.href=binaryEyeUrl;
+}
+
+
+/*
+  پردازش نتیجه‌ای که Binary Eye
+  هنگام برگشت به سایت قرار داده است.
+*/
+async function handleBinaryEyeReturn(){
+
+  const currentUrl=
+    new URL(window.location.href);
+
+  const scannedResult=
+    currentUrl.searchParams.get(
+      "binaryEyeResult"
+    );
+
+  if(!scannedResult){
+
+    return;
+  }
+
+  /*
+    پارامتر نتیجه را از URL پاک می‌کنیم
+    تا با refresh دوباره پردازش نشود.
+  */
+  currentUrl.searchParams.delete(
+    "binaryEyeResult"
+  );
+
+  window.history.replaceState(
+    {},
+    document.title,
+    currentUrl.toString()
+  );
+
+  /*
+    ابتدا پاپ‌آپ را باز می‌کنیم.
+  */
+  openStockModal();
+
+  /*
+    اطلاعات قبلی فرم را برمی‌گردانیم.
+  */
+  restoreStockDraft();
+
+  /*
+    بارکد اسکن‌شده باید جایگزین بارکد قبلی شود.
+  */
+  const barcode=
+    normalizeBarcode(scannedResult);
+
+  $("stockBarcode").value=barcode;
+
+  /*
+    حالا همان بارکد را از products
+    مربوط به فروشگاه فعلی پیدا می‌کنیم.
+  */
+  await lookupStockProduct();
+
+  /*
+    تمرکز روی تعداد برای اینکه کاربر
+    بعد از اسکن مستقیماً ادامه دهد.
+  */
+  setTimeout(()=>{
+
+    if($("stockProduct").value){
+
+      $("stockQuantity").focus();
+
+    }else{
+
+      $("stockBarcode").focus();
+
+    }
+
+  },150);
 }
 
 
@@ -2000,7 +2506,22 @@ function openStockModal(){
 
   populateStockProducts();
 
+  clearStockProduct();
+
+  $("stockBarcode").value="";
+
+  $("stockQuantity").value="";
+  $("stockPurchasePrice").value="";
+  $("stockSalePrice").value="";
+  $("stockNote").value="";
+
+  $("stockSubmitBtn").disabled=true;
+
   openModal("stockModal");
+
+  setTimeout(()=>{
+    $("stockBarcode").focus();
+  },100);
 }
 
 
@@ -2012,16 +2533,35 @@ $("stockForm").addEventListener(
 
     const productId=$("stockProduct").value;
     const quantity=Number($("stockQuantity").value);
-    const purchasePrice=Number($("stockPurchasePrice").value);
-    const salePrice=Number($("stockSalePrice").value);
+    const purchasePrice=Number(
+      $("stockPurchasePrice").value
+    );
+    const salePrice=Number(
+      $("stockSalePrice").value
+    );
     const note=$("stockNote").value.trim();
 
-    if(!productId || quantity<=0){
-      toast("اطلاعات ورود کالا کامل نیست");
+    if(!productId){
+
+      toast(
+        "ابتدا بارکد کالا را وارد یا اسکن کنید"
+      );
+
+      return;
+    }
+
+    if(quantity<=0){
+
+      toast(
+        "تعداد ورود کالا صحیح نیست"
+      );
+
       return;
     }
 
     try{
+
+      $("stockSubmitBtn").disabled=true;
 
       const {
         data,
@@ -2043,6 +2583,14 @@ $("stockForm").addEventListener(
 
       $("stockForm").reset();
 
+      $("stockProduct").value="";
+      $("stockProductName").value="";
+      $("stockLookupStatus").textContent="";
+      $("stockLookupStatus").className=
+        "stock-status";
+
+      $("stockSubmitBtn").disabled=true;
+
       toast("ورود کالا ثبت شد");
 
       await loadStoreData();
@@ -2050,6 +2598,8 @@ $("stockForm").addEventListener(
     }catch(error){
 
       console.error(error);
+
+      $("stockSubmitBtn").disabled=false;
 
       toast(
         error.message ||
@@ -3019,6 +3569,10 @@ async function logout(){
   localStorage.removeItem("biza_session");
   localStorage.removeItem("biza_profile");
 
+  sessionStorage.removeItem(
+    "biza_stock_draft"
+  );
+
   hide("storePage");
   hide("adminPage");
   show("loginPage");
@@ -3084,6 +3638,12 @@ document
 
 createNetwork();
 
+/*
+  مهم:
+  restoreSession باید کامل شود تا state.store
+  و محصولات فروشگاه مشخص باشند؛ سپس نتیجه
+  Binary Eye پردازش می‌شود.
+*/
 restoreSession();
 
 </script>
